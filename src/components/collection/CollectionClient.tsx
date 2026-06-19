@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react'
 import { CardThumbnail } from '@/components/cards/CardThumbnail'
 import { CardDetailModal } from '@/components/cards/CardDetailModal'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Layers } from 'lucide-react'
 import type { Rarity } from '@/generated/prisma/client'
 
 const RARITIES: Rarity[] = ['LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON']
@@ -32,21 +34,30 @@ type SortOption = 'rarity' | 'newest' | 'name'
 export function CollectionClient({ entries }: { entries: CardEntry[] }) {
   const [rarityFilter, setRarityFilter] = useState<string>('')
   const [sort, setSort] = useState<SortOption>('rarity')
-  const [selected, setSelected] = useState<CardEntry | null>(null)
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
 
+  // Total copies per card across the whole collection
   const copiesByCardId = useMemo(() => {
     const map: Record<string, number> = {}
     entries.forEach((e) => { map[e.cardId] = (map[e.cardId] ?? 0) + 1 })
     return map
   }, [entries])
 
-  const filtered = useMemo(() => {
+  // Sorted + filtered + deduplicated (one row per unique card)
+  const dedupedFiltered = useMemo(() => {
     let list = rarityFilter ? entries.filter((e) => e.card.rarity === rarityFilter) : entries
     if (sort === 'rarity') list = [...list].sort((a, b) => (RARITY_ORDER[a.card.rarity] ?? 5) - (RARITY_ORDER[b.card.rarity] ?? 5))
     if (sort === 'newest') list = [...list].sort((a, b) => new Date(b.obtainedAt).getTime() - new Date(a.obtainedAt).getTime())
     if (sort === 'name') list = [...list].sort((a, b) => a.card.name.localeCompare(b.card.name))
-    return list
+    const seen = new Set<string>()
+    return list.filter((e) => {
+      if (seen.has(e.cardId)) return false
+      seen.add(e.cardId)
+      return true
+    })
   }, [entries, rarityFilter, sort])
+
+  const totalInFilter = rarityFilter ? entries.filter((e) => e.card.rarity === rarityFilter).length : entries.length
 
   return (
     <>
@@ -78,24 +89,43 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
           <option value="name">Sort: A–Z</option>
         </select>
         <span className="text-xs text-muted-foreground">
-          {filtered.length} card{filtered.length !== 1 ? 's' : ''}
+          {dedupedFiltered.length} unique · {totalInFilter} total
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {filtered.map((entry) => (
-          <CardThumbnail
-            key={entry.id}
-            card={{ ...entry.card, rarity: entry.card.rarity as Rarity }}
-            onClick={() => setSelected(entry)}
-          />
-        ))}
-      </div>
+      {dedupedFiltered.length === 0 ? (
+        <EmptyState
+          icon={Layers}
+          title="No cards match this filter"
+          description="Try a different rarity or clear the filter."
+        />
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {dedupedFiltered.map((entry, i) => {
+            const count = copiesByCardId[entry.cardId] ?? 1
+            return (
+              <div key={entry.cardId} className="relative">
+                <CardThumbnail
+                  card={{ ...entry.card, rarity: entry.card.rarity as Rarity }}
+                  onClick={() => setSelectedIdx(i)}
+                />
+                {count > 1 && (
+                  <div className="absolute top-1.5 right-1.5 z-10 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-bold px-1.5 py-0.5 shadow-lg min-w-[1.5rem] text-center pointer-events-none">
+                    ×{count}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <CardDetailModal
-        entry={selected}
-        copies={selected ? (copiesByCardId[selected.cardId] ?? 1) : 0}
-        onClose={() => setSelected(null)}
+        entries={dedupedFiltered}
+        index={selectedIdx}
+        copiesByCardId={copiesByCardId}
+        onClose={() => setSelectedIdx(null)}
+        onNavigate={setSelectedIdx}
       />
     </>
   )
