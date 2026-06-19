@@ -17,13 +17,14 @@ export async function PATCH(
   const admin = await requireAdmin()
   const { userId } = await ctx.params
 
-  if (userId === admin.id) {
-    return NextResponse.json({ error: 'Cannot modify your own account via admin panel' }, { status: 400 })
-  }
-
   const body = await request.json()
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+
+  // Admins can change their own coin balance, but not their own role or ban status
+  if (userId === admin.id && (parsed.data.role !== undefined || parsed.data.isBanned !== undefined)) {
+    return NextResponse.json({ error: 'Cannot change your own role or ban status' }, { status: 400 })
+  }
 
   const user = await prisma.user.update({ where: { id: userId }, data: parsed.data })
   return NextResponse.json({ id: user.id, role: user.role, isBanned: user.isBanned, coinBalance: user.coinBalance })
