@@ -2,6 +2,7 @@ import { requireAuth } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import { RARITY_BADGE_COLORS } from '@/lib/rarity'
+import { ACHIEVEMENTS } from '@/lib/achievements'
 import type { Rarity } from '@/generated/prisma/client'
 
 const RARITY_ORDER: Rarity[] = ['LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON']
@@ -23,20 +24,46 @@ export default async function UserProfilePage({
       id: true,
       name: true,
       email: true,
+      coinBalance: true,
       createdAt: true,
       collectionEntries: {
         select: { card: { select: { rarity: true } } },
+      },
+      _count: {
+        select: {
+          listings: true,
+          packOpens: true,
+        },
       },
     },
   })
 
   if (!profile) notFound()
 
+  const tradeCount = await prisma.trade.count({
+    where: {
+      status: 'ACCEPTED',
+      OR: [{ initiatorId: userId }, { receiverId: userId }],
+    },
+  })
+
   const totalCards = profile.collectionEntries.length
+  const legendaryCount = profile.collectionEntries.filter((e) => e.card.rarity === 'LEGENDARY').length
   const rarityCounts: Record<string, number> = {}
   for (const entry of profile.collectionEntries) {
     rarityCounts[entry.card.rarity] = (rarityCounts[entry.card.rarity] ?? 0) + 1
   }
+
+  const stats = {
+    totalCards,
+    legendaryCount,
+    tradeCount,
+    listingCount: profile._count.listings,
+    packsOpened: profile._count.packOpens,
+    coinBalance: profile.coinBalance,
+  }
+
+  const unlockedIds = new Set(ACHIEVEMENTS.filter((a) => a.check(stats)).map((a) => a.id))
 
   const displayName = profile.name ?? profile.email.split('@')[0]
   const initial = displayName[0].toUpperCase()
@@ -58,10 +85,19 @@ export default async function UserProfilePage({
       </div>
 
       <div className="rounded-2xl border border-border/50 bg-card/40 p-6 space-y-5">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Collection</p>
-          <p className="text-4xl font-black">{totalCards}</p>
-          <p className="text-sm text-muted-foreground">card{totalCards !== 1 ? 's' : ''} total</p>
+        <div className="flex gap-6">
+          <div>
+            <p className="text-3xl font-black">{totalCards}</p>
+            <p className="text-xs text-muted-foreground">Cards</p>
+          </div>
+          <div>
+            <p className="text-3xl font-black">{tradeCount}</p>
+            <p className="text-xs text-muted-foreground">Trades</p>
+          </div>
+          <div>
+            <p className="text-3xl font-black">{profile._count.packOpens}</p>
+            <p className="text-xs text-muted-foreground">Packs opened</p>
+          </div>
         </div>
 
         {totalCards > 0 && (
@@ -80,16 +116,38 @@ export default async function UserProfilePage({
                     <span className="text-xs text-muted-foreground">{count} ({pct}%)</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-border/50 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-primary/60 transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-full rounded-full bg-primary/60" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
             })}
           </div>
         )}
+      </div>
+
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Achievements</p>
+        <div className="grid grid-cols-2 gap-3">
+          {ACHIEVEMENTS.map((achievement) => {
+            const unlocked = unlockedIds.has(achievement.id)
+            return (
+              <div
+                key={achievement.id}
+                className={`rounded-xl border p-3 flex items-start gap-3 transition-all ${
+                  unlocked
+                    ? 'border-primary/30 bg-primary/5'
+                    : 'border-border/30 bg-card/20 opacity-40 grayscale'
+                }`}
+              >
+                <span className="text-2xl">{unlocked ? achievement.emoji : '🔒'}</span>
+                <div>
+                  <p className="text-sm font-bold">{achievement.name}</p>
+                  <p className="text-xs text-muted-foreground leading-snug">{achievement.description}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

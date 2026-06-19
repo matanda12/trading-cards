@@ -131,3 +131,14 @@
     @apply font-sans;
   }
 }
+
+@keyframes legendary-pulse {
+  0%, 100% { box-shadow: 0 0 20px 4px rgba(251, 191, 36, 0.6); }
+  50%       { box-shadow: 0 0 40px 8px rgba(251, 191, 36, 0.9); }
+}
+@keyframes epic-pulse {
+  0%, 100% { box-shadow: 0 0 16px 4px rgba(168, 85, 247, 0.5); }
+  50%       { box-shadow: 0 0 32px 8px rgba(168, 85, 247, 0.8); }
+}
+.animate-legendary-glow { animation: legendary-pulse 1.5s ease-in-out infinite; }
+.animate-epic-glow      { animation: epic-pulse 1.5s ease-in-out infinite; }

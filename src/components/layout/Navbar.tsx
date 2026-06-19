@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { logoutAction } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { NotificationBell } from './NotificationBell'
+import { Settings } from 'lucide-react'
 
 const navLinks = [
   { href: '/collection', label: 'Collection' },
@@ -56,7 +58,8 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <NotificationBell />
         <Link
           href="/coins"
           className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
@@ -68,6 +71,13 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
           className="text-xs px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 transition-colors font-semibold"
         >
           + Buy Coins
+        </Link>
+        <Link
+          href="/settings"
+          className="p-1.5 rounded-lg hover:bg-accent/30 transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="Settings"
+        >
+          <Settings size={16} />
         </Link>
         <form action={logoutAction}>
           <Button type="submit" variant="outline" size="sm">

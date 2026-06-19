@@ -35,15 +35,17 @@ enum ListingStatus {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String?
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(USER)
-  isBanned     Boolean  @default(false)
-  coinBalance  Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  passwordHash   String
+  role           Role      @default(USER)
+  isBanned       Boolean   @default(false)
+  coinBalance    Int       @default(0)
+  lastLoginBonus DateTime?
+  loginStreak    Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   sessions          Session[]
   collectionEntries CollectionEntry[]
@@ -52,6 +54,7 @@ model User {
   listings          Listing[]
   packOpens         PackOpen[]
   redeemedCodes     RedemptionCode[]
+  notifications     Notification[]
 }
 
 model Session {
@@ -210,4 +213,17 @@ model PackOpenResult {
   collectionEntryId String @unique
 
   packOpen PackOpen @relation(fields: [packOpenId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
 }

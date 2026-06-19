@@ -84,6 +84,9 @@ export async function POST(request: NextRequest) {
 
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)
 
+  const initiator = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true, email: true } })
+  const initiatorName = initiator?.name ?? initiator?.email?.split('@')[0] ?? 'Someone'
+
   const trade = await prisma.trade.create({
     data: {
       initiatorId: user.id,
@@ -96,6 +99,14 @@ export async function POST(request: NextRequest) {
           ...wantedEntryIds.map((id) => ({ ownerId: receiverId, collectionEntryId: id })),
         ],
       },
+    },
+  })
+
+  await prisma.notification.create({
+    data: {
+      userId: receiverId,
+      type: 'TRADE_RECEIVED',
+      message: `${initiatorName} sent you a trade offer`,
     },
   })
 

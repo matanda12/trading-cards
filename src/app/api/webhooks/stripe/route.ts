@@ -36,9 +36,18 @@ export async function POST(request: NextRequest) {
       const buyerId = session.metadata?.buyerId
 
       if (listingId && buyerId) {
+        let sellerId: string | null = null
+        let cardName: string | null = null
+
         await prisma.$transaction(async (tx) => {
-          const listing = await tx.listing.findUnique({ where: { id: listingId } })
+          const listing = await tx.listing.findUnique({
+            where: { id: listingId },
+            include: { card: true },
+          })
           if (!listing || listing.status === 'SOLD') return
+
+          sellerId = listing.sellerId
+          cardName = listing.card.name
 
           await tx.listing.update({
             where: { id: listingId },
@@ -50,6 +59,16 @@ export async function POST(request: NextRequest) {
             data: { userId: buyerId, source: 'PURCHASE' },
           })
         })
+
+        if (sellerId && cardName) {
+          await prisma.notification.create({
+            data: {
+              userId: sellerId,
+              type: 'LISTING_SOLD',
+              message: `Your listing for "${cardName}" was sold!`,
+            },
+          })
+        }
       }
     }
   }

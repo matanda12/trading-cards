@@ -52,6 +52,17 @@ export async function PATCH(
       where: { id: tradeId },
       data: { status: action === 'CANCEL' ? 'CANCELLED' : 'REJECTED' },
     })
+
+    if (action === 'REJECT') {
+      await prisma.notification.create({
+        data: {
+          userId: trade.initiatorId,
+          type: 'TRADE_REJECTED',
+          message: 'Your trade offer was declined',
+        },
+      })
+    }
+
     return NextResponse.json(updated)
   }
 
@@ -76,6 +87,14 @@ export async function PATCH(
   } catch {
     return NextResponse.json({ error: 'Transaction failed' }, { status: 500 })
   }
+
+  await prisma.notification.create({
+    data: {
+      userId: trade.initiatorId,
+      type: 'TRADE_ACCEPTED',
+      message: 'Your trade offer was accepted!',
+    },
+  })
 
   return NextResponse.json({ success: true })
 }

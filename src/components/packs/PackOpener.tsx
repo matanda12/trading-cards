@@ -1,12 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 type Card = { id: string; name: string; imageUrl: string; rarity: string }
+
+const rarityGlows: Record<string, string> = {
+  LEGENDARY: 'border-yellow-400 animate-legendary-glow',
+  EPIC: 'border-purple-500 animate-epic-glow',
+  RARE: 'shadow-blue-500/40 border-blue-500',
+  UNCOMMON: 'shadow-green-400/30 border-green-400',
+  COMMON: 'border-slate-400',
+}
 
 export function PackOpener({
   packId,
@@ -21,6 +29,23 @@ export function PackOpener({
   const [loading, setLoading] = useState(false)
   const [cards, setCards] = useState<Card[]>([])
   const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    if (!revealed || cards.length === 0) return
+    const hasRare = cards.some((c) => c.rarity === 'LEGENDARY' || c.rarity === 'EPIC')
+    if (!hasRare) return
+    import('canvas-confetti').then(({ default: confetti }) => {
+      const isLegendary = cards.some((c) => c.rarity === 'LEGENDARY')
+      confetti({
+        particleCount: isLegendary ? 180 : 100,
+        spread: 90,
+        origin: { y: 0.5 },
+        colors: isLegendary
+          ? ['#fbbf24', '#f59e0b', '#ffffff', '#fef3c7']
+          : ['#a855f7', '#7c3aed', '#ffffff', '#ede9fe'],
+      })
+    })
+  }, [revealed, cards])
 
   async function openPack() {
     setLoading(true)
@@ -39,14 +64,6 @@ export function PackOpener({
     } finally {
       setLoading(false)
     }
-  }
-
-  const rarityGlows: Record<string, string> = {
-    LEGENDARY: 'shadow-yellow-400/60 border-yellow-400',
-    EPIC: 'shadow-purple-500/50 border-purple-500',
-    RARE: 'shadow-blue-500/40 border-blue-500',
-    UNCOMMON: 'shadow-green-400/30 border-green-400',
-    COMMON: 'border-slate-400',
   }
 
   if (cards.length > 0) {
