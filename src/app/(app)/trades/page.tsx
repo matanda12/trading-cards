@@ -41,6 +41,16 @@ export default async function TradesPage() {
   }
 
   const pendingCount = received.filter((t) => t.status === 'PENDING').length
+  const now = new Date()
+
+  function expiryLabel(expiresAt: Date, status: string) {
+    if (status !== 'PENDING') return null
+    const diffMs = expiresAt.getTime() - now.getTime()
+    if (diffMs <= 0) return 'Expired'
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    if (diffHours < 24) return `${diffHours}h left`
+    return `${Math.ceil(diffMs / (1000 * 60 * 60 * 24))}d left`
+  }
 
   return (
     <div className="space-y-8">
@@ -81,9 +91,14 @@ export default async function TradesPage() {
                         Offering: {cardNames(trade, trade.initiatorId) || '—'} · Wants: {cardNames(trade, user.id) || '—'}
                       </p>
                     </div>
-                    <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
-                      {trade.status}
-                    </span>
+                    <div className="shrink-0 text-right space-y-0.5">
+                      <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold block ${statusStyles[trade.status]}`}>
+                        {trade.status}
+                      </span>
+                      {expiryLabel(trade.expiresAt, trade.status) && (
+                        <span className="text-xs text-muted-foreground">{expiryLabel(trade.expiresAt, trade.status)}</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -112,9 +127,14 @@ export default async function TradesPage() {
                         Offering: {cardNames(trade, user.id) || '—'} · Wants: {cardNames(trade, trade.receiverId) || '—'}
                       </p>
                     </div>
-                    <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
-                      {trade.status}
-                    </span>
+                    <div className="shrink-0 text-right space-y-0.5">
+                      <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold block ${statusStyles[trade.status]}`}>
+                        {trade.status}
+                      </span>
+                      {expiryLabel(trade.expiresAt, trade.status) && (
+                        <span className="text-xs text-muted-foreground">{expiryLabel(trade.expiresAt, trade.status)}</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               ))}

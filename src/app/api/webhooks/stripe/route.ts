@@ -20,25 +20,38 @@ export async function POST(request: NextRequest) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as import('stripe').Stripe.Checkout.Session
-    const listingId = session.metadata?.listingId
-    const buyerId = session.metadata?.buyerId
+    const type = session.metadata?.type
 
-    if (!listingId || !buyerId) return NextResponse.json({ ok: true })
+    if (type === 'coin_purchase') {
+      const userId = session.metadata?.userId
+      const coinAmount = Number(session.metadata?.coinAmount ?? '0')
+      if (userId && coinAmount > 0) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { coinBalance: { increment: coinAmount } },
+        })
+      }
+    } else {
+      const listingId = session.metadata?.listingId
+      const buyerId = session.metadata?.buyerId
 
-    await prisma.$transaction(async (tx) => {
-      const listing = await tx.listing.findUnique({ where: { id: listingId } })
-      if (!listing || listing.status === 'SOLD') return
+      if (listingId && buyerId) {
+        await prisma.$transaction(async (tx) => {
+          const listing = await tx.listing.findUnique({ where: { id: listingId } })
+          if (!listing || listing.status === 'SOLD') return
 
-      await tx.listing.update({
-        where: { id: listingId },
-        data: { status: 'SOLD', buyerId, soldAt: new Date() },
-      })
+          await tx.listing.update({
+            where: { id: listingId },
+            data: { status: 'SOLD', buyerId, soldAt: new Date() },
+          })
 
-      await tx.collectionEntry.update({
-        where: { id: listing.collectionEntryId },
-        data: { userId: buyerId, source: 'PURCHASE' },
-      })
-    })
+          await tx.collectionEntry.update({
+            where: { id: listing.collectionEntryId },
+            data: { userId: buyerId, source: 'PURCHASE' },
+          })
+        })
+      }
+    }
   }
 
   return NextResponse.json({ ok: true })

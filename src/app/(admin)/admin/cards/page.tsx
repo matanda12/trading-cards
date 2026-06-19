@@ -50,7 +50,7 @@ export default async function AdminCardsPage() {
                 <td className="p-3 text-right">{card._count.redemptionCodes}</td>
                 <td className="p-3 text-right">{card._count.collectionEntries}</td>
                 <td className="p-3">
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${card.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${card.isActive ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
                     {card.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>

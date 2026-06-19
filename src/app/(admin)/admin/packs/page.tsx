@@ -20,18 +20,24 @@ export default async function AdminPacksPage() {
 
       <div className="grid gap-4">
         {packs.map((pack) => (
-          <div key={pack.id} className="border rounded-lg p-4 flex items-center justify-between">
+          <div key={pack.id} className="border border-border/50 rounded-xl p-4 flex items-center justify-between bg-card/40">
             <div>
               <p className="font-semibold">{pack.name}</p>
               <p className="text-muted-foreground text-sm">{pack.description}</p>
               <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
                 <span>{pack.coinCost} coins · {pack.cardCount} cards</span>
                 <span>{pack._count.slots} card types · {pack._count.packOpens} opened</span>
-                <span className={pack.isActive ? 'text-green-600' : 'text-red-500'}>
+                <span className={`font-semibold ${pack.isActive ? 'text-green-400' : 'text-red-400'}`}>
                   {pack.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
             </div>
+            <Link
+              href={`/admin/packs/${pack.id}/edit`}
+              className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-colors"
+            >
+              Edit
+            </Link>
           </div>
         ))}
         {packs.length === 0 && (

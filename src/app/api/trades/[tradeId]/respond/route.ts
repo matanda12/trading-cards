@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/session'
 
-const schema = z.object({ action: z.enum(['ACCEPT', 'REJECT', 'CANCEL']) })
+const schema = z.object({ action: z.enum(['ACCEPT', 'REJECT', 'CANCEL', 'EXPIRE']) })
 
 export async function PATCH(
   request: NextRequest,
@@ -31,6 +31,14 @@ export async function PATCH(
 
   const isInitiator = trade.initiatorId === user.id
   const isReceiver = trade.receiverId === user.id
+
+  if (action === 'EXPIRE') {
+    if (trade.expiresAt > new Date()) {
+      return NextResponse.json({ error: 'Trade has not expired yet' }, { status: 409 })
+    }
+    const updated = await prisma.trade.update({ where: { id: tradeId }, data: { status: 'EXPIRED' } })
+    return NextResponse.json(updated)
+  }
 
   if (action === 'CANCEL' && !isInitiator) {
     return NextResponse.json({ error: 'Only the initiator can cancel' }, { status: 403 })

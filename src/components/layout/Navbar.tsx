@@ -57,9 +57,18 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-sm font-bold text-amber-400">
+        <Link
+          href="/coins"
+          className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
+        >
           🪙 {coinBalance.toLocaleString()}
-        </div>
+        </Link>
+        <Link
+          href="/coins"
+          className="text-xs px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 transition-colors font-semibold"
+        >
+          + Buy Coins
+        </Link>
         <form action={logoutAction}>
           <Button type="submit" variant="outline" size="sm">
             Sign Out

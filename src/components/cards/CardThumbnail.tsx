@@ -1,11 +1,20 @@
 import Image from 'next/image'
-import { Card } from '@/generated/prisma/client'
+import { Rarity } from '@/generated/prisma/client'
 import { RARITY_COLORS } from '@/lib/rarity'
 import { RarityBadge } from './RarityBadge'
 import { cn } from '@/lib/utils'
 
+// Minimal card shape — compatible with Prisma Card and client-serialized data
+type CardLike = {
+  id: string
+  name: string
+  imageUrl: string
+  rarity: Rarity
+  description?: string | null
+}
+
 type Props = {
-  card: Card
+  card: CardLike
   selected?: boolean
   onClick?: () => void
   compact?: boolean
