@@ -3,12 +3,12 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
-const statusColors: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-800',
-  ACCEPTED: 'bg-green-100 text-green-800',
-  REJECTED: 'bg-red-100 text-red-800',
-  CANCELLED: 'bg-gray-100 text-gray-600',
-  EXPIRED: 'bg-gray-100 text-gray-500',
+const statusStyles: Record<string, string> = {
+  PENDING:   'border-yellow-500/30  bg-yellow-500/10  text-yellow-300',
+  ACCEPTED:  'border-green-500/30   bg-green-500/10   text-green-300',
+  REJECTED:  'border-red-500/30     bg-red-500/10     text-red-300',
+  CANCELLED: 'border-border         bg-muted/50       text-muted-foreground',
+  EXPIRED:   'border-border         bg-muted/30       text-muted-foreground/60',
 }
 
 export default async function TradesPage() {
@@ -33,39 +33,55 @@ export default async function TradesPage() {
     }),
   ])
 
-  function tradeCard(trade: (typeof sent)[0] | (typeof received)[0], ownerId: string) {
+  function cardNames(trade: (typeof sent)[0] | (typeof received)[0], ownerId: string) {
     return trade.items
       .filter((i) => i.ownerId === ownerId)
       .map((i) => i.collectionEntry.card.name)
       .join(', ')
   }
 
+  const pendingCount = received.filter((t) => t.status === 'PENDING').length
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Trades</h1>
+    <div className="space-y-8">
+      <div className="flex items-end justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">Trades</p>
+          <h1 className="text-3xl font-black tracking-tight">Trade Offers</h1>
+        </div>
         <Button render={<Link href="/trades/new" />}>+ New Trade</Button>
       </div>
 
       <div className="space-y-8">
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Received ({received.filter((t) => t.status === 'PENDING').length} pending)</h2>
+        <section className="space-y-3">
+          <h2 className="text-base font-semibold flex items-center gap-2">
+            Received
+            {pendingCount > 0 && (
+              <span className="rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-xs font-bold text-yellow-300">
+                {pendingCount} pending
+              </span>
+            )}
+          </h2>
           {received.length === 0 ? (
             <p className="text-muted-foreground text-sm">No received trade offers.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {received.map((trade) => (
-                <Link key={trade.id} href={`/trades/${trade.id}`} className="border rounded-lg p-4 block hover:shadow-sm transition-shadow">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-sm">
+                <Link
+                  key={trade.id}
+                  href={`/trades/${trade.id}`}
+                  className="rounded-xl border border-border/50 bg-card/40 p-4 block hover:bg-card/70 hover:border-border transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm">
                         From: {trade.initiator.name ?? trade.initiator.email}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Offering: {tradeCard(trade, trade.initiatorId) || '—'} · Wants: {tradeCard(trade, user.id) || '—'}
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        Offering: {cardNames(trade, trade.initiatorId) || '—'} · Wants: {cardNames(trade, user.id) || '—'}
                       </p>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[trade.status]}`}>
+                    <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
                       {trade.status}
                     </span>
                   </div>
@@ -75,24 +91,28 @@ export default async function TradesPage() {
           )}
         </section>
 
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Sent</h2>
+        <section className="space-y-3">
+          <h2 className="text-base font-semibold">Sent</h2>
           {sent.length === 0 ? (
             <p className="text-muted-foreground text-sm">No sent trade offers.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {sent.map((trade) => (
-                <Link key={trade.id} href={`/trades/${trade.id}`} className="border rounded-lg p-4 block hover:shadow-sm transition-shadow">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-sm">
+                <Link
+                  key={trade.id}
+                  href={`/trades/${trade.id}`}
+                  className="rounded-xl border border-border/50 bg-card/40 p-4 block hover:bg-card/70 hover:border-border transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm">
                         To: {trade.receiver.name ?? trade.receiver.email}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Offering: {tradeCard(trade, user.id) || '—'} · Wants: {tradeCard(trade, trade.receiverId) || '—'}
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        Offering: {cardNames(trade, user.id) || '—'} · Wants: {cardNames(trade, trade.receiverId) || '—'}
                       </p>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColors[trade.status]}`}>
+                    <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
                       {trade.status}
                     </span>
                   </div>

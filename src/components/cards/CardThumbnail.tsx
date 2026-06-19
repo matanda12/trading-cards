@@ -16,10 +16,10 @@ export function CardThumbnail({ card, selected, onClick, compact = false }: Prop
     <div
       onClick={onClick}
       className={cn(
-        'relative rounded-lg border-2 overflow-hidden cursor-pointer transition-all duration-150',
+        'relative rounded-xl border-2 overflow-hidden transition-all duration-200',
         RARITY_COLORS[card.rarity],
-        selected && 'ring-2 ring-primary ring-offset-2 scale-95',
-        onClick && 'hover:scale-105',
+        onClick && 'cursor-pointer hover:scale-105 hover:brightness-110',
+        selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-95',
         compact ? 'w-24' : 'w-full aspect-[5/7]'
       )}
     >
@@ -33,8 +33,8 @@ export function CardThumbnail({ card, selected, onClick, compact = false }: Prop
         />
       </div>
       {!compact && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-          <p className="text-white text-xs font-semibold truncate">{card.name}</p>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-2 pt-6">
+          <p className="text-white text-xs font-bold truncate drop-shadow">{card.name}</p>
           <RarityBadge rarity={card.rarity} />
         </div>
       )}

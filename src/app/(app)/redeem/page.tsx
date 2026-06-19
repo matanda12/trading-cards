@@ -37,39 +37,43 @@ export default function RedeemPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6 py-10">
+    <div className="max-w-md mx-auto py-12 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Redeem a Code</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">Redeem</p>
+        <h1 className="text-3xl font-black tracking-tight">Enter Your Code</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Enter your unique card code to add it to your collection.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1">
-          <Label htmlFor="code">Card Code</Label>
-          <Input
-            id="code"
-            placeholder="XXXX-XXXX-XXXX-XXXX"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            className="font-mono text-lg tracking-wider"
-            maxLength={19}
-            required
-          />
-          <p className="text-xs text-muted-foreground">Format: XXXX-XXXX-XXXX-XXXX</p>
-        </div>
-        <Button type="submit" className="w-full" disabled={loading || code.length < 4}>
-          {loading ? 'Redeeming…' : 'Redeem Code'}
-        </Button>
-      </form>
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 space-y-5 shadow-xl shadow-black/20">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="code">Card Code</Label>
+            <Input
+              id="code"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              className="font-mono text-lg tracking-widest text-center"
+              maxLength={19}
+              required
+            />
+            <p className="text-xs text-muted-foreground text-center">Format: XXXX-XXXX-XXXX-XXXX</p>
+          </div>
+          <Button type="submit" className="w-full" disabled={loading || code.length < 4}>
+            {loading ? 'Redeeming…' : 'Redeem Code'}
+          </Button>
+        </form>
 
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-900 rounded p-4">
-          <p className="font-semibold">Success!</p>
-          <p className="text-sm">{success} has been added to your collection.</p>
-        </div>
-      )}
+        {success && (
+          <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-center">
+            <p className="text-2xl mb-1">🎉</p>
+            <p className="font-bold text-green-300">Card Unlocked!</p>
+            <p className="text-sm text-green-400/80 mt-0.5">{success} added to your collection.</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

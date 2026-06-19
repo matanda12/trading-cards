@@ -18,18 +18,24 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
   const pathname = usePathname()
 
   return (
-    <nav className="border-b bg-background px-4 py-3 flex items-center gap-6">
-      <Link href="/collection" className="font-bold text-lg shrink-0">
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center gap-6">
+      <Link
+        href="/collection"
+        className="font-black text-lg shrink-0 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight"
+      >
         CardVault
       </Link>
-      <div className="flex gap-4 flex-1">
+
+      <div className="flex gap-0.5 flex-1">
         {navLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
-              'text-sm hover:text-foreground transition-colors',
-              pathname.startsWith(link.href) ? 'text-foreground font-medium' : 'text-muted-foreground'
+              'text-sm px-3 py-1.5 rounded-md transition-colors',
+              pathname.startsWith(link.href)
+                ? 'text-foreground font-semibold bg-accent/40'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
             )}
           >
             {link.label}
@@ -39,20 +45,25 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
           <Link
             href="/admin"
             className={cn(
-              'text-sm hover:text-foreground transition-colors',
-              pathname.startsWith('/admin') ? 'text-foreground font-medium' : 'text-muted-foreground'
+              'text-sm px-3 py-1.5 rounded-md transition-colors',
+              pathname.startsWith('/admin')
+                ? 'text-foreground font-semibold bg-accent/40'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
             )}
           >
             Admin
           </Link>
         )}
       </div>
+
       <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">{coinBalance.toLocaleString()}</span> coins
-        </span>
+        <div className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-sm font-bold text-amber-400">
+          🪙 {coinBalance.toLocaleString()}
+        </div>
         <form action={logoutAction}>
-          <Button type="submit" variant="outline" size="sm">Sign Out</Button>
+          <Button type="submit" variant="outline" size="sm">
+            Sign Out
+          </Button>
         </form>
       </div>
     </nav>

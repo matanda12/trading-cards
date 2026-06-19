@@ -17,49 +17,57 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Sign In</h1>
+        <Link
+          href="/"
+          className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight"
+        >
+          CardVault
+        </Link>
+        <h1 className="text-xl font-bold mt-3">Welcome back</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="underline">Register</Link>
+          <Link href="/register" className="text-primary hover:underline font-medium">Register</Link>
         </p>
       </div>
 
-      {registered && (
-        <div className="bg-green-50 border border-green-200 text-green-800 text-sm rounded p-3">
-          Account created! Sign in below.
-        </div>
-      )}
-      {banned && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm rounded p-3">
-          Your account has been suspended.
-        </div>
-      )}
-      {state?.message && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm rounded p-3">
-          {state.message}
-        </div>
-      )}
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 shadow-2xl shadow-black/30 space-y-5">
+        {registered && (
+          <div className="rounded-xl border border-green-500/30 bg-green-500/10 text-green-300 text-sm p-3 text-center">
+            Account created! Sign in below.
+          </div>
+        )}
+        {banned && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm p-3 text-center">
+            Your account has been suspended.
+          </div>
+        )}
+        {state?.message && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm p-3 text-center">
+            {state.message}
+          </div>
+        )}
 
-      <form action={action} className="space-y-4">
-        <div className="space-y-1">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" autoComplete="email" required />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" autoComplete="current-password" required />
-        </div>
-        <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? 'Signing in…' : 'Sign In'}
-        </Button>
-      </form>
+        <form action={action} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" autoComplete="email" required />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" name="password" type="password" autoComplete="current-password" required />
+          </div>
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? 'Signing in…' : 'Sign In'}
+          </Button>
+        </form>
+      </div>
     </div>
   )
 }
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-1 items-center justify-center px-4">
+    <main className="flex flex-1 items-center justify-center px-4 py-12">
       <Suspense>
         <LoginForm />
       </Suspense>
