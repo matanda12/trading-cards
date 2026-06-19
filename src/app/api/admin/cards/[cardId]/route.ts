@@ -13,6 +13,17 @@ const updateSchema = z.object({
   isActive: z.boolean().optional(),
 })
 
+export async function GET(
+  _request: NextRequest,
+  ctx: { params: Promise<{ cardId: string }> }
+) {
+  await requireAdmin()
+  const { cardId } = await ctx.params
+  const card = await prisma.card.findUnique({ where: { id: cardId } })
+  if (!card) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  return NextResponse.json(card)
+}
+
 export async function PATCH(
   request: NextRequest,
   ctx: { params: Promise<{ cardId: string }> }
