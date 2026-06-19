@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  isBanned     Boolean  @default(false)
+  coinBalance  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions          Session[]
+  collectionEntries CollectionEntry[]
+  sentTrades        Trade[]           @relation("SentTrades")
+  receivedTrades    Trade[]           @relation("ReceivedTrades")
+  listings          Listing[]
+  packOpens         PackOpen[]
+  redeemedCodes     RedemptionCode[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  imageUrl    String
+  rarity      Rarity
+  category    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  collectionEntries CollectionEntry[]
+  redemptionCodes   RedemptionCode[]
+  packSlots         PackSlot[]
+  listings          Listing[]
+}
+
+model CollectionEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  cardId     String
+  obtainedAt DateTime @default(now())
+  source     String
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card      Card       @relation(fields: [cardId], references: [id])
+  listing   Listing?
+  tradeItem TradeItem?
+
+  @@index([userId])
+  @@index([cardId])
+}
+
+model RedemptionCode {
+  id         String    @id @default(cuid())
+  code       String    @unique
+  cardId     String
+  isRedeemed Boolean   @default(false)
+  redeemedBy String?
+  redeemedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  card Card  @relation(fields: [cardId], references: [id])
+  user User? @relation(fields: [redeemedBy], references: [id])
+
+  @@index([code])
+  @@index([cardId])
+}
+
+model Trade {
+  id          String      @id @default(cuid())
+  initiatorId String
+  receiverId  String
+  status      TradeStatus @default(PENDING)
+  message     String?
+  expiresAt   DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  initiator User        @relation("SentTrades", fields: [initiatorId], references: [id])
+  receiver  User        @relation("ReceivedTrades", fields: [receiverId], references: [id])
+  items     TradeItem[]
+
+  @@index([initiatorId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+model TradeItem {
+  id                String @id @default(cuid())
+  tradeId           String
+  ownerId           String
+  collectionEntryId String @unique
+
+  trade           Trade           @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  collectionEntry CollectionEntry @relation(fields: [collectionEntryId], references: [id])
+
+  @@index([tradeId])
+}
+
+model Listing {
+  id                String        @id @default(cuid())
+  sellerId          String
+  cardId            String
+  collectionEntryId String        @unique
+  priceCents        Int
+  status            ListingStatus @default(ACTIVE)
+  stripeSessionId   String?
+  buyerId           String?
+  soldAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  seller          User            @relation(fields: [sellerId], references: [id])
+  card            Card            @relation(fields: [cardId], references: [id])
+  collectionEntry CollectionEntry @relation(fields: [collectionEntryId], references: [id])
+
+  @@index([status])
+  @@index([cardId])
+  @@index([sellerId])
+}
+
+model Pack {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  coinCost    Int
+  cardCount   Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  slots     PackSlot[]
+  packOpens PackOpen[]
+}
+
+model PackSlot {
+  id     String @id @default(cuid())
+  packId String
+  cardId String
+  weight Int
+
+  pack Pack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@index([packId])
+}
+
+model PackOpen {
+  id        String    @id @default(cuid())
+  userId    String
+  packId    String
+  openedAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  user       User             @relation(fields: [userId], references: [id])
+  pack       Pack             @relation(fields: [packId], references: [id])
+  cardsGiven PackOpenResult[]
+}
+
+model PackOpenResult {
+  id                String @id @default(cuid())
+  packOpenId        String
+  collectionEntryId String @unique
+
+  packOpen PackOpen @relation(fields: [packOpenId], references: [id], onDelete: Cascade)
+}

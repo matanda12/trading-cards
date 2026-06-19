@@ -1,0 +1,61 @@
+'use server'
+
+import { z } from 'zod'
+import bcrypt from 'bcryptjs'
+import { prisma } from '@/lib/prisma'
+import { signIn, signOut } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { AuthError } from 'next-auth'
+
+const registerSchema = z.object({
+  name: z.string().min(2).trim(),
+  email: z.string().email().trim(),
+  password: z
+    .string()
+    .min(8)
+    .regex(/[a-zA-Z]/)
+    .regex(/[0-9]/),
+})
+
+export type ActionState = { errors?: Record<string, string[]>; message?: string } | undefined
+
+export async function registerAction(state: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = registerSchema.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+  })
+
+  if (!parsed.success) {
+    return { errors: parsed.error.flatten().fieldErrors }
+  }
+
+  const { name, email, password } = parsed.data
+
+  const existing = await prisma.user.findUnique({ where: { email } })
+  if (existing) return { errors: { email: ['Email already registered'] } }
+
+  const passwordHash = await bcrypt.hash(password, 12)
+  await prisma.user.create({ data: { name, email, passwordHash } })
+
+  redirect('/login?registered=true')
+}
+
+export async function loginAction(state: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirectTo: '/collection',
+    })
+  } catch (err) {
+    if (err instanceof AuthError) {
+      return { message: 'Invalid email or password' }
+    }
+    throw err
+  }
+}
+
+export async function logoutAction() {
+  await signOut({ redirectTo: '/' })
+}
