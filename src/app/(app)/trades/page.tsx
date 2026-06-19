@@ -2,6 +2,8 @@ import { requireAuth } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Clock, CheckCircle, XCircle, Ban, Timer, ArrowLeftRight } from 'lucide-react'
 
 const statusStyles: Record<string, string> = {
   PENDING:   'border-yellow-500/30  bg-yellow-500/10  text-yellow-300',
@@ -9,6 +11,14 @@ const statusStyles: Record<string, string> = {
   REJECTED:  'border-red-500/30     bg-red-500/10     text-red-300',
   CANCELLED: 'border-border         bg-muted/50       text-muted-foreground',
   EXPIRED:   'border-border         bg-muted/30       text-muted-foreground/60',
+}
+
+const statusIcons: Record<string, React.ReactNode> = {
+  PENDING:   <Clock size={10} className="inline mr-1 -mt-px" />,
+  ACCEPTED:  <CheckCircle size={10} className="inline mr-1 -mt-px" />,
+  REJECTED:  <XCircle size={10} className="inline mr-1 -mt-px" />,
+  CANCELLED: <Ban size={10} className="inline mr-1 -mt-px" />,
+  EXPIRED:   <Timer size={10} className="inline mr-1 -mt-px" />,
 }
 
 export default async function TradesPage() {
@@ -73,7 +83,11 @@ export default async function TradesPage() {
             )}
           </h2>
           {received.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No received trade offers.</p>
+            <EmptyState
+              icon={ArrowLeftRight}
+              title="No received trades"
+              description="When someone sends you a trade offer, it will appear here."
+            />
           ) : (
             <div className="space-y-2">
               {received.map((trade) => (
@@ -93,7 +107,7 @@ export default async function TradesPage() {
                     </div>
                     <div className="shrink-0 text-right space-y-0.5">
                       <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold block ${statusStyles[trade.status]}`}>
-                        {trade.status}
+                        {statusIcons[trade.status]}{trade.status}
                       </span>
                       {expiryLabel(trade.expiresAt, trade.status) && (
                         <span className="text-xs text-muted-foreground">{expiryLabel(trade.expiresAt, trade.status)}</span>
@@ -109,7 +123,13 @@ export default async function TradesPage() {
         <section className="space-y-3">
           <h2 className="text-base font-semibold">Sent</h2>
           {sent.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No sent trade offers.</p>
+            <EmptyState
+              icon={ArrowLeftRight}
+              title="No sent trades"
+              description="Start a new trade to offer cards to other collectors."
+            >
+              <Button render={<Link href="/trades/new" />} size="sm">+ New Trade</Button>
+            </EmptyState>
           ) : (
             <div className="space-y-2">
               {sent.map((trade) => (
@@ -129,7 +149,7 @@ export default async function TradesPage() {
                     </div>
                     <div className="shrink-0 text-right space-y-0.5">
                       <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold block ${statusStyles[trade.status]}`}>
-                        {trade.status}
+                        {statusIcons[trade.status]}{trade.status}
                       </span>
                       {expiryLabel(trade.expiresAt, trade.status) && (
                         <span className="text-xs text-muted-foreground">{expiryLabel(trade.expiresAt, trade.status)}</span>

@@ -5,6 +5,7 @@ import { RarityBadge } from '@/components/cards/RarityBadge'
 import type { Rarity } from '@/generated/prisma/client'
 import { TradeActions } from './TradeActions'
 import Link from 'next/link'
+import { Clock, CheckCircle, XCircle, Ban, Timer } from 'lucide-react'
 
 const statusStyles: Record<string, string> = {
   PENDING:   'border-yellow-500/30  bg-yellow-500/10  text-yellow-300',
@@ -12,6 +13,14 @@ const statusStyles: Record<string, string> = {
   REJECTED:  'border-red-500/30     bg-red-500/10     text-red-300',
   CANCELLED: 'border-border         bg-muted/50       text-muted-foreground',
   EXPIRED:   'border-border         bg-muted/30       text-muted-foreground/60',
+}
+
+const statusIcons: Record<string, React.ReactNode> = {
+  PENDING:   <Clock size={11} className="inline mr-1 -mt-px" />,
+  ACCEPTED:  <CheckCircle size={11} className="inline mr-1 -mt-px" />,
+  REJECTED:  <XCircle size={11} className="inline mr-1 -mt-px" />,
+  CANCELLED: <Ban size={11} className="inline mr-1 -mt-px" />,
+  EXPIRED:   <Timer size={11} className="inline mr-1 -mt-px" />,
 }
 
 function formatExpiresAt(expiresAt: Date): string {
@@ -69,8 +78,8 @@ export default async function TradeDetailPage({
           <h1 className="text-2xl font-black tracking-tight">Review Trade</h1>
         </div>
         <div className="text-right space-y-1">
-          <span className={`inline-block text-xs px-3 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
-            {trade.status}
+          <span className={`inline-flex items-center text-xs px-3 py-1 rounded-full border font-semibold ${statusStyles[trade.status]}`}>
+            {statusIcons[trade.status]}{trade.status}
           </span>
           {trade.status === 'PENDING' && (
             <p className="text-xs text-muted-foreground">{formatExpiresAt(trade.expiresAt)}</p>

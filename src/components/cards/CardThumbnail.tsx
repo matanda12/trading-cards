@@ -1,10 +1,12 @@
+'use client'
+
 import Image from 'next/image'
+import { useState } from 'react'
 import { Rarity } from '@/generated/prisma/client'
 import { RARITY_COLORS } from '@/lib/rarity'
 import { RarityBadge } from './RarityBadge'
 import { cn } from '@/lib/utils'
 
-// Minimal card shape — compatible with Prisma Card and client-serialized data
 type CardLike = {
   id: string
   name: string
@@ -21,13 +23,35 @@ type Props = {
 }
 
 export function CardThumbnail({ card, selected, onClick, compact = false }: Props) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const isInteractive = !!onClick
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+    setTilt({ x: (y - 0.5) * -14, y: (x - 0.5) * 14 })
+  }
+
+  function handleMouseLeave() {
+    setTilt({ x: 0, y: 0 })
+  }
+
+  const isIdle = tilt.x === 0 && tilt.y === 0
+
   return (
     <div
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: isIdle ? 'transform 0.4s ease' : 'transform 0.08s ease-out',
+      }}
       className={cn(
-        'relative rounded-xl border-2 overflow-hidden transition-all duration-200',
+        'relative rounded-xl border-2 overflow-hidden',
         RARITY_COLORS[card.rarity],
-        onClick && 'cursor-pointer hover:scale-105 hover:brightness-110',
+        isInteractive && 'cursor-pointer hover:brightness-110',
         selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-95',
         compact ? 'w-24' : 'w-full aspect-[5/7]'
       )}
