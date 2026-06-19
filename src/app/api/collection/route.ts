@@ -10,10 +10,13 @@ export async function GET(request: NextRequest) {
   const rarity = searchParams.get('rarity')
   const category = searchParams.get('category')
   const search = searchParams.get('q')
+  // Allow fetching another user's collection for trade purposes
+  const targetUserId = searchParams.get('userId') ?? user.id
+  const isOwn = targetUserId === user.id
 
-  const entries = await prisma.collectionEntry.findMany({
+  const allEntries = await prisma.collectionEntry.findMany({
     where: {
-      userId: user.id,
+      userId: targetUserId,
       card: {
         ...(rarity ? { rarity: rarity as never } : {}),
         ...(category ? { category } : {}),
@@ -28,6 +31,13 @@ export async function GET(request: NextRequest) {
     },
     orderBy: { obtainedAt: 'desc' },
   })
+
+  // For other users' collections, only expose tradeable (unlocked) cards
+  const entries = isOwn
+    ? allEntries
+    : allEntries.filter(
+        (e) => e.listing?.status !== 'ACTIVE' && e.tradeItem?.trade?.status !== 'PENDING'
+      )
 
   return NextResponse.json(entries)
 }
