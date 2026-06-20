@@ -60,8 +60,8 @@ export default async function TradeDetailPage({
       where: { id: tradeId },
       data: { status: 'EXPIRED' },
       include: {
-        initiator: { select: { id: true, name: true, email: true } },
-        receiver: { select: { id: true, name: true, email: true } },
+        initiator: { select: { id: true, name: true, username: true } },
+        receiver: { select: { id: true, name: true, username: true } },
         items: { include: { collectionEntry: { include: { card: true } } } },
       },
     })
