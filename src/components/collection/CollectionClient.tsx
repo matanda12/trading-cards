@@ -19,6 +19,7 @@ type CardEntry = {
   id: string
   cardId: string
   obtainedAt: string
+  wishlisted: boolean
   card: {
     id: string
     name: string
@@ -26,15 +27,29 @@ type CardEntry = {
     rarity: string
     category: string
     description: string | null
+    ownerCount: number
   }
 }
 
 type SortOption = 'rarity' | 'newest' | 'name'
 
-export function CollectionClient({ entries }: { entries: CardEntry[] }) {
+export function CollectionClient({
+  entries,
+  totalCards,
+  ownedUnique,
+}: {
+  entries: CardEntry[]
+  totalCards: number
+  ownedUnique: number
+}) {
   const [rarityFilter, setRarityFilter] = useState<string>('')
   const [sort, setSort] = useState<SortOption>('rarity')
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
+  const [wishlistedIds, setWishlistedIds] = useState<Set<string>>(
+    () => new Set(entries.filter((e) => e.wishlisted).map((e) => e.cardId))
+  )
+
+  const pct = totalCards > 0 ? Math.round((ownedUnique / totalCards) * 100) : 0
 
   // Total copies per card across the whole collection
   const copiesByCardId = useMemo(() => {
@@ -59,8 +74,33 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
 
   const totalInFilter = rarityFilter ? entries.filter((e) => e.card.rarity === rarityFilter).length : entries.length
 
+  async function toggleWishlist(cardId: string) {
+    const isWishlisted = wishlistedIds.has(cardId)
+    setWishlistedIds((prev) => {
+      const next = new Set(prev)
+      isWishlisted ? next.delete(cardId) : next.add(cardId)
+      return next
+    })
+    await fetch(`/api/wishlist/${cardId}`, { method: isWishlisted ? 'DELETE' : 'POST' })
+  }
+
   return (
     <>
+      {/* Progress bar */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold text-slate-300">Collection Progress</span>
+          <span className="text-slate-400">{ownedUnique} / {totalCards} cards ({pct}%)</span>
+        </div>
+        <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-amber-500 to-purple-500 transition-all duration-700"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <p className="text-xs text-slate-500">{totalCards - ownedUnique} cards still to discover</p>
+      </div>
+
       <div className="flex flex-wrap gap-3 items-center">
         <div className="flex gap-2 flex-wrap flex-1">
           <button
@@ -103,17 +143,26 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dedupedFiltered.map((entry, i) => {
             const count = copiesByCardId[entry.cardId] ?? 1
+            const isWishlisted = wishlistedIds.has(entry.cardId)
             return (
               <div key={entry.cardId} className="relative">
                 <CardThumbnail
                   card={{ ...entry.card, rarity: entry.card.rarity as Rarity }}
                   onClick={() => setSelectedIdx(i)}
+                  ownerCount={entry.card.ownerCount}
                 />
                 {count > 1 && (
                   <div className="absolute top-1.5 right-1.5 z-10 rounded-full bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-1.5 py-0.5 shadow-lg min-w-[1.5rem] text-center pointer-events-none">
                     ×{count}
                   </div>
                 )}
+                <button
+                  onClick={() => toggleWishlist(entry.cardId)}
+                  className="absolute top-1.5 left-1.5 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 transition-colors"
+                  title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                  <span className="text-xs">{isWishlisted ? '⭐' : '☆'}</span>
+                </button>
               </div>
             )
           })}

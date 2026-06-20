@@ -19,6 +19,7 @@ type Props = {
   selected?: boolean
   onClick?: () => void
   compact?: boolean
+  ownerCount?: number
 }
 
 const BORDER_COLORS: Record<Rarity, string> = {
@@ -53,7 +54,7 @@ const RARITY_LABELS: Record<Rarity, string> = {
   LEGENDARY: 'Legendary',
 }
 
-export function CardThumbnail({ card, selected, onClick, compact = false }: Props) {
+export function CardThumbnail({ card, selected, onClick, compact = false, ownerCount }: Props) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const isInteractive = !!onClick
 
@@ -110,9 +111,14 @@ export function CardThumbnail({ card, selected, onClick, compact = false }: Prop
           <p className="font-cinzel text-xs font-bold text-white truncate leading-tight mb-1.5">
             {card.name}
           </p>
-          <span className={cn('inline-block text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase', BADGE_COLORS[card.rarity])}>
-            {RARITY_LABELS[card.rarity]}
-          </span>
+          <div className="flex items-center justify-between gap-1">
+            <span className={cn('inline-block text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase', BADGE_COLORS[card.rarity])}>
+              {RARITY_LABELS[card.rarity]}
+            </span>
+            {ownerCount !== undefined && (
+              <span className="text-[9px] text-slate-400 shrink-0">{ownerCount} {ownerCount === 1 ? 'owner' : 'owners'}</span>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -9,6 +9,8 @@ const createSchema = z.object({
   imageUrl: z.string().url().optional(),
   coinCost: z.number().int().min(0),
   cardCount: z.number().int().min(1).max(20),
+  validFrom: z.string().datetime({ offset: true }).optional().nullable(),
+  validUntil: z.string().datetime({ offset: true }).optional().nullable(),
   slots: z.array(z.object({ cardId: z.string(), weight: z.number().int().min(1) })).min(1),
 })
 

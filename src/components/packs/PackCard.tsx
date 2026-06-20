@@ -39,6 +39,7 @@ type Props = {
     description: string | null
     coinCost: number
     cardCount: number
+    validUntil?: Date | string | null
   }
   badge: { label: string; color: string } | undefined
   tint: string
@@ -46,6 +47,17 @@ type Props = {
   canAfford: boolean
   legendaryRate: DropRate | undefined
   epicRate: DropRate | undefined
+}
+
+function formatCountdown(validUntil: Date | string): string {
+  const ms = new Date(validUntil).getTime() - Date.now()
+  if (ms <= 0) return 'Ended'
+  const days = Math.floor(ms / 86400000)
+  const hrs = Math.floor((ms % 86400000) / 3600000)
+  const mins = Math.floor((ms % 3600000) / 60000)
+  if (days > 0) return `${days}d ${hrs}h left`
+  if (hrs > 0) return `${hrs}h ${mins}m left`
+  return `${mins}m left`
 }
 
 export function PackCard({ pack, badge, tint, dropRates, canAfford, legendaryRate, epicRate }: Props) {
@@ -111,6 +123,12 @@ export function PackCard({ pack, badge, tint, dropRates, canAfford, legendaryRat
           <h3 className="font-cinzel font-bold text-base text-white">{pack.name}</h3>
           {pack.description && (
             <p className="text-slate-500 text-xs mt-0.5 leading-relaxed line-clamp-2">{pack.description}</p>
+          )}
+          {pack.validUntil && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-orange-400">
+              <span>⏳</span>
+              <span>{formatCountdown(pack.validUntil)}</span>
+            </div>
           )}
         </div>
 

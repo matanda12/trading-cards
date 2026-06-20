@@ -6,11 +6,15 @@ import { CollectionClient } from '@/components/collection/CollectionClient'
 export default async function CollectionPage() {
   const user = await requireAuth()
 
-  const entries = await prisma.collectionEntry.findMany({
-    where: { userId: user.id, card: { isActive: true } },
-    include: { card: true },
-    orderBy: [{ card: { rarity: 'asc' } }, { obtainedAt: 'desc' }],
-  })
+  const [entries, totalCards, wishlistItems] = await Promise.all([
+    prisma.collectionEntry.findMany({
+      where: { userId: user.id, card: { isActive: true } },
+      include: { card: { include: { _count: { select: { collectionEntries: true } } } } },
+      orderBy: [{ card: { rarity: 'asc' } }, { obtainedAt: 'desc' }],
+    }),
+    prisma.card.count({ where: { isActive: true } }),
+    prisma.wishlist.findMany({ where: { userId: user.id }, select: { cardId: true } }),
+  ])
 
   if (entries.length === 0) {
     return (
@@ -32,6 +36,9 @@ export default async function CollectionPage() {
     )
   }
 
+  const wishlistedCardIds = new Set(wishlistItems.map((w) => w.cardId))
+  const uniqueOwned = new Set(entries.map((e) => e.cardId)).size
+
   // Serialize dates for client component
   const serialized = entries.map((e) => ({
     id: e.id,
@@ -44,7 +51,9 @@ export default async function CollectionPage() {
       rarity: e.card.rarity,
       category: e.card.category,
       description: e.card.description,
+      ownerCount: e.card._count.collectionEntries,
     },
+    wishlisted: wishlistedCardIds.has(e.cardId),
   }))
 
   return (
@@ -55,7 +64,7 @@ export default async function CollectionPage() {
           <h1 className="font-cinzel text-3xl font-black tracking-wide text-white">My Collection</h1>
         </div>
       </div>
-      <CollectionClient entries={serialized} />
+      <CollectionClient entries={serialized} totalCards={totalCards} ownedUnique={uniqueOwned} />
     </div>
   )
 }

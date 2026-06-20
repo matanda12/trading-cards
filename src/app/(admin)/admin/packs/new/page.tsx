@@ -55,6 +55,8 @@ export default function NewPackPage() {
           description: formData.get('description'),
           coinCost: Number(formData.get('coinCost')),
           cardCount: Number(formData.get('cardCount')),
+          validFrom: formData.get('validFrom') || null,
+          validUntil: formData.get('validUntil') || null,
           slots,
         }),
       })
@@ -87,6 +89,14 @@ export default function NewPackPage() {
           <div className="space-y-1">
             <Label htmlFor="description">Description</Label>
             <Input id="description" name="description" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="validFrom">Available From (optional)</Label>
+            <Input id="validFrom" name="validFrom" type="datetime-local" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="validUntil">Available Until (optional)</Label>
+            <Input id="validUntil" name="validUntil" type="datetime-local" />
           </div>
         </div>
 

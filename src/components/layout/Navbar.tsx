@@ -7,17 +7,19 @@ import { logoutAction } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NotificationBell } from './NotificationBell'
+import { DailyQuests } from './DailyQuests'
 import { Settings, Menu, X } from 'lucide-react'
 
 const navLinks = [
   { href: '/collection', label: 'Collection' },
-  { href: '/redeem', label: 'Redeem' },
-  { href: '/trades', label: 'Trades' },
-  { href: '/marketplace', label: 'Marketplace' },
   { href: '/packs', label: 'Packs' },
+  { href: '/trades', label: 'Trades' },
+  { href: '/marketplace', label: 'Market' },
+  { href: '/leaderboard', label: 'Ranks' },
+  { href: '/feed', label: 'Feed' },
 ]
 
-export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance: number }) {
+export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean; coinBalance: number; loginStreak: number }) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -66,7 +68,13 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
         <div className="flex-1 md:hidden" />
 
         <div className="flex items-center gap-2">
+          <DailyQuests />
           <NotificationBell />
+          {loginStreak > 0 && (
+            <span className="hidden sm:flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/10 px-2.5 py-1.5 text-xs font-bold text-orange-400">
+              🔥 {loginStreak}
+            </span>
+          )}
           <Link
             href="/coins"
             className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
@@ -131,6 +139,21 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
             </Link>
           )}
           <div className="border-t border-white/10 pt-2 mt-1 space-y-1">
+            {[
+              { href: '/wishlist', label: '⭐ Wishlist' },
+              { href: '/gift', label: '🎁 Gift a Card' },
+              { href: '/craft', label: '🔨 Craft' },
+              { href: '/redeem', label: '🎟️ Redeem' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block px-4 py-2.5 rounded-lg text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
             <Link
               href="/settings"
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"

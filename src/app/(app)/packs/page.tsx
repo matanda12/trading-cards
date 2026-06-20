@@ -36,8 +36,13 @@ export default async function PacksPage() {
   const user = await requireAuth()
   const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { coinBalance: true } })
 
+  const now = new Date()
   const packs = await prisma.pack.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      OR: [{ validFrom: null }, { validFrom: { lte: now } }],
+      AND: [{ OR: [{ validUntil: null }, { validUntil: { gte: now } }] }],
+    },
     include: { slots: { include: { card: { select: { rarity: true } } } } },
     orderBy: { coinCost: 'asc' },
   })
@@ -48,13 +53,18 @@ export default async function PacksPage() {
   return (
     <div className="space-y-10 pb-12">
       {/* Header */}
-      <div>
-        <p className="font-cinzel text-xs font-semibold uppercase tracking-widest text-amber-400/70 mb-1">✦ Store</p>
-        <h1 className="font-cinzel text-3xl font-black tracking-wide text-white">Open Packs</h1>
-        <p className="text-slate-400 text-sm mt-2 max-w-xl leading-relaxed">
-          Spend your gold to unseal booster packs and summon new champions into your collection.<br />
-          Higher tiers carry richer odds and guaranteed pulls.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-cinzel text-xs font-semibold uppercase tracking-widest text-amber-400/70 mb-1">✦ Store</p>
+          <h1 className="font-cinzel text-3xl font-black tracking-wide text-white">Open Packs</h1>
+          <p className="text-slate-400 text-sm mt-2 max-w-xl leading-relaxed">
+            Spend your gold to unseal booster packs and summon new champions into your collection.<br />
+            Higher tiers carry richer odds and guaranteed pulls.
+          </p>
+        </div>
+        <Link href="/packs/history" className="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20 transition-colors">
+          📜 History
+        </Link>
       </div>
 
       {/* Featured Pack */}
@@ -108,7 +118,7 @@ export default async function PacksPage() {
             return (
               <PackCard
                 key={pack.id}
-                pack={pack}
+                pack={{ ...pack, validUntil: pack.validUntil ?? null }}
                 badge={PACK_BADGES[pack.name]}
                 tint={PACK_TINTS[pack.name] ?? 'from-purple-950/50'}
                 dropRates={dropRates}
