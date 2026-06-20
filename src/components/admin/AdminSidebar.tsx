@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, CreditCard, Package, Users, Key, ShoppingBag, ChevronLeft, Menu, X } from 'lucide-react'
+import { LayoutDashboard, CreditCard, Package, Users, Key, ShoppingBag, ChevronLeft, Menu, X, ArrowLeftRight, Receipt, Star, DollarSign } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -13,6 +13,9 @@ const links = [
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/codes', label: 'Codes', icon: Key },
   { href: '/admin/listings', label: 'Listings', icon: ShoppingBag },
+  { href: '/admin/trades', label: 'Trades', icon: ArrowLeftRight },
+  { href: '/admin/sales', label: 'Sales', icon: DollarSign },
+  { href: '/admin/wishlist', label: 'Wishlist', icon: Star },
 ]
 
 function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 
+import Link from 'next/link'
+
 type User = {
   id: string
   name: string | null
@@ -115,6 +117,9 @@ export default function AdminUsersPage() {
                     >
                       + Coins
                     </Button>
+                    <Link href={`/admin/users/${u.id}`}>
+                      <Button variant="outline" size="sm">View</Button>
+                    </Link>
                   </div>
                 </td>
               </tr>
