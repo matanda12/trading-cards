@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NotificationBell } from './NotificationBell'
 import { DailyQuests } from './DailyQuests'
-import { Settings, Menu, X } from 'lucide-react'
+import { Settings, Menu, X, ChevronDown } from 'lucide-react'
 
 const navLinks = [
   { href: '/collection', label: 'Collection' },
@@ -19,9 +19,17 @@ const navLinks = [
   { href: '/feed', label: 'Feed' },
 ]
 
+const moreLinks = [
+  { href: '/wishlist', label: '⭐ Wishlist' },
+  { href: '/gift', label: '🎁 Gift a Card' },
+  { href: '/craft', label: '🔨 Craft' },
+  { href: '/redeem', label: '🎟️ Redeem' },
+]
+
 export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean; coinBalance: number; loginStreak: number }) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
 
   return (
     <nav className="sticky top-0 z-50 bg-[#080810]/90 backdrop-blur-md animate-navbar-glow border-b border-purple-500/20">
@@ -52,6 +60,39 @@ export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean
               </Link>
             )
           })}
+          {/* More dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setMoreOpen((o) => !o)}
+              className={cn(
+                'flex items-center gap-1 text-sm px-4 py-2 transition-colors font-medium tracking-wide',
+                moreLinks.some((l) => pathname.startsWith(l.href)) ? 'text-amber-300' : 'text-slate-400 hover:text-slate-200'
+              )}
+            >
+              More <ChevronDown size={12} className={cn('transition-transform', moreOpen && 'rotate-180')} />
+            </button>
+            {moreOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+                <div className="absolute top-full left-0 z-50 mt-1 w-44 rounded-xl border border-white/10 bg-[#0d0d1a] shadow-2xl overflow-hidden">
+                  {moreLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMoreOpen(false)}
+                      className={cn(
+                        'block px-4 py-2.5 text-sm transition-colors',
+                        pathname.startsWith(link.href) ? 'text-amber-300 bg-amber-500/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
           {isAdmin && (
             <Link
               href="/admin"
