@@ -24,7 +24,7 @@ export default async function ListingDetailPage({
     where: { id: listingId },
     include: {
       card: true,
-      seller: { select: { id: true, name: true, email: true } },
+      seller: { select: { id: true, name: true, username: true } },
     },
   })
 
@@ -64,7 +64,7 @@ export default async function ListingDetailPage({
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Seller</span>
-          <span className="font-medium">{listing.seller.name ?? listing.seller.email}</span>
+          <span className="font-medium">{listing.seller.username ? `@${listing.seller.username}` : (listing.seller.name ?? 'Unknown')}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Status</span>

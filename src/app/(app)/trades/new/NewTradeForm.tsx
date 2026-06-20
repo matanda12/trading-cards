@@ -10,7 +10,7 @@ import { RarityBadge } from '@/components/cards/RarityBadge'
 import type { Card, CollectionEntry } from '@/generated/prisma/client'
 
 type EntryWithCard = CollectionEntry & { card: Card }
-type SearchUser = { id: string; name: string | null; email: string }
+type SearchUser = { id: string; name: string | null; username: string | null }
 
 export function NewTradeForm({
   myEntries,
@@ -85,8 +85,8 @@ export function NewTradeForm({
         {receiver ? (
           <div className="flex items-center gap-3 p-3 border rounded-lg">
             <div className="flex-1">
-              <p className="font-medium">{receiver.name ?? receiver.email}</p>
-              <p className="text-xs text-muted-foreground">{receiver.email}</p>
+              <p className="font-medium">{receiver.username ? `@${receiver.username}` : (receiver.name ?? 'Unknown')}</p>
+              {receiver.name && receiver.username && <p className="text-xs text-muted-foreground">{receiver.name}</p>}
             </div>
             <Button variant="outline" size="sm" onClick={() => { setReceiver(null); setStep(1); setReceiverEntries([]) }}>
               Change
@@ -95,7 +95,7 @@ export function NewTradeForm({
         ) : (
           <div className="space-y-2">
             <Input
-              placeholder="Search by name or email…"
+              placeholder="Search by username or name…"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); searchUsers(e.target.value) }}
             />
@@ -107,8 +107,8 @@ export function NewTradeForm({
                     className="w-full text-left p-3 hover:bg-muted/50 transition-colors"
                     onClick={() => selectReceiver(u)}
                   >
-                    <p className="font-medium text-sm">{u.name ?? u.email}</p>
-                    <p className="text-xs text-muted-foreground">{u.email}</p>
+                    <p className="font-medium text-sm">{u.username ? `@${u.username}` : (u.name ?? 'Unknown')}</p>
+                    {u.name && u.username && <p className="text-xs text-muted-foreground">{u.name}</p>}
                   </button>
                 ))}
               </div>

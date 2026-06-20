@@ -13,6 +13,16 @@ npm run db:generate  # Regenerate Prisma client after schema changes
 npm run db:studio    # Open Prisma Studio
 ```
 
+### One-off scripts (run from project root with `npx tsx`)
+```bash
+npx tsx prisma/seed.ts                 # Seed admin + sample cards
+npx tsx prisma/seed-packs.ts           # Create/update Starter, Premium, Legendary Hunt packs
+npx tsx prisma/import-cards.ts         # Import card definitions from JSON
+npx tsx prisma/generate-card-images.ts # Generate AI card art via gpt-image-1 → Cloudinary
+npx tsx prisma/generate-card-back.ts   # Generate card back image → Cloudinary
+```
+All scripts load `.env.local` via `dotenv.config({ path: '.env.local' })` at the top.
+
 **Important**: `npm run db:push` must use the direct Supabase connection (port `5432`) for DDL, not the Transaction Pooler. Override inline:
 ```bash
 DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres" npm run db:push
@@ -26,6 +36,9 @@ The Transaction Pooler URL (port `6543`) hangs on schema migrations but is requi
 - **Route params**: always `await params` — they are Promises: `{ params: Promise<{ id: string }> }`
 - **No `RouteContext` type**: use inline param types in route handlers
 - **`useSearchParams`**: must be in a child component wrapped with `<Suspense>`
+
+### TypeScript build exclusion
+`tsconfig.json` excludes the `"prisma"` directory. This prevents Vercel from type-checking the `prisma/*.ts` scripts, which import Node-only packages (dotenv, openai, cloudinary) that don't exist in the Next.js bundle. Without this exclusion, builds fail with type errors in those scripts.
 
 ### Prisma 7.8.0
 - **Generator**: `provider = "prisma-client"` (not `prisma-client-js`)

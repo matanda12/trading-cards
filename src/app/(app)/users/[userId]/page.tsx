@@ -23,7 +23,7 @@ export default async function UserProfilePage({
     select: {
       id: true,
       name: true,
-      email: true,
+      username: true,
       coinBalance: true,
       createdAt: true,
       collectionEntries: {
@@ -65,8 +65,8 @@ export default async function UserProfilePage({
 
   const unlockedIds = new Set(ACHIEVEMENTS.filter((a) => a.check(stats)).map((a) => a.id))
 
-  const displayName = profile.name ?? profile.email.split('@')[0]
-  const initial = displayName[0].toUpperCase()
+  const displayName = profile.username ? `@${profile.username}` : (profile.name ?? 'Unknown')
+  const initial = (profile.username ?? profile.name ?? '?')[0].toUpperCase()
   const joined = profile.createdAt.toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',

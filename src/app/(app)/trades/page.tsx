@@ -28,7 +28,7 @@ export default async function TradesPage() {
     prisma.trade.findMany({
       where: { initiatorId: user.id },
       include: {
-        receiver: { select: { name: true, email: true } },
+        receiver: { select: { name: true, username: true } },
         items: { include: { collectionEntry: { include: { card: { select: { name: true } } } } } },
       },
       orderBy: { createdAt: 'desc' },
@@ -36,7 +36,7 @@ export default async function TradesPage() {
     prisma.trade.findMany({
       where: { receiverId: user.id },
       include: {
-        initiator: { select: { name: true, email: true } },
+        initiator: { select: { name: true, username: true } },
         items: { include: { collectionEntry: { include: { card: { select: { name: true } } } } } },
       },
       orderBy: { createdAt: 'desc' },
@@ -99,7 +99,7 @@ export default async function TradesPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-semibold text-sm">
-                        From: {trade.initiator.name ?? trade.initiator.email}
+                        From: {trade.initiator.username ? `@${trade.initiator.username}` : (trade.initiator.name ?? 'Unknown')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">
                         Offering: {cardNames(trade, trade.initiatorId) || '—'} · Wants: {cardNames(trade, user.id) || '—'}
@@ -141,7 +141,7 @@ export default async function TradesPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-semibold text-sm">
-                        To: {trade.receiver.name ?? trade.receiver.email}
+                        To: {trade.receiver.username ? `@${trade.receiver.username}` : (trade.receiver.name ?? 'Unknown')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">
                         Offering: {cardNames(trade, user.id) || '—'} · Wants: {cardNames(trade, trade.receiverId) || '—'}

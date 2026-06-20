@@ -6,7 +6,7 @@ export default async function SettingsPage() {
   const user = await requireAuth()
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { name: true, email: true },
+    select: { name: true, email: true, username: true },
   })
 
   return (
@@ -18,7 +18,7 @@ export default async function SettingsPage() {
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-5">
         <h2 className="text-sm font-bold text-slate-200">Profile</h2>
-        <SettingsForm initialName={dbUser?.name ?? ''} email={dbUser?.email ?? ''} />
+        <SettingsForm initialName={dbUser?.name ?? ''} initialUsername={dbUser?.username ?? ''} email={dbUser?.email ?? ''} />
       </div>
     </div>
   )

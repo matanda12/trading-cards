@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
 
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000)
 
-  const initiator = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true, email: true } })
-  const initiatorName = initiator?.name ?? initiator?.email?.split('@')[0] ?? 'Someone'
+  const initiator = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true, username: true } })
+  const initiatorName = initiator?.username ? `@${initiator.username}` : (initiator?.name ?? 'Someone')
 
   const trade = await prisma.trade.create({
     data: {

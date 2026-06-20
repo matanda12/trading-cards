@@ -18,7 +18,7 @@ type Listing = {
   priceCents: number
   createdAt: string
   card: { name: string; rarity: string; imageUrl: string }
-  seller: { id: string; name: string | null; email: string }
+  seller: { id: string; name: string | null; username: string | null }
 }
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc'
@@ -111,7 +111,7 @@ export function MarketplaceClient({
               <div className="bg-card/80 p-2 space-y-0.5">
                 <p className="text-sm font-bold text-green-400">${(listing.priceCents / 100).toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {listing.seller.id === currentUserId ? 'Your listing' : (listing.seller.name ?? listing.seller.email)}
+                  {listing.seller.id === currentUserId ? 'Your listing' : (listing.seller.username ? `@${listing.seller.username}` : (listing.seller.name ?? 'Unknown'))}
                 </p>
               </div>
             </Link>

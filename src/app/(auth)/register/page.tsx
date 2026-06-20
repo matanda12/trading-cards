@@ -30,10 +30,11 @@ export default function RegisterPage() {
         <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 shadow-2xl shadow-black/30 space-y-4">
           <form action={action} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" autoComplete="name" required />
-              {state?.errors?.name && (
-                <p className="text-destructive text-xs">{state.errors.name[0]}</p>
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" name="username" autoComplete="username" placeholder="e.g. shadow_mage" required />
+              <p className="text-muted-foreground text-xs">3–20 chars, letters/numbers/underscores. Shown to other players.</p>
+              {state?.errors?.username && (
+                <p className="text-destructive text-xs">{state.errors.username[0]}</p>
               )}
             </div>
             <div className="space-y-1.5">

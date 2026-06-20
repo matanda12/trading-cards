@@ -11,7 +11,7 @@ export default async function AdminListingsPage() {
     where: { status: 'ACTIVE' },
     include: {
       card: true,
-      seller: { select: { name: true, email: true } },
+      seller: { select: { name: true, username: true } },
     },
     orderBy: { createdAt: 'desc' },
   })
@@ -49,7 +49,7 @@ export default async function AdminListingsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {listing.seller.name ?? listing.seller.email}
+                    {listing.seller.username ? `@${listing.seller.username}` : (listing.seller.name ?? 'Unknown')}
                   </td>
                   <td className="px-4 py-3 font-bold text-green-400">
                     ${(listing.priceCents / 100).toFixed(2)}

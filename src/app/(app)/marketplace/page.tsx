@@ -11,7 +11,7 @@ export default async function MarketplacePage() {
     where: { status: 'ACTIVE', card: { isActive: true } },
     include: {
       card: true,
-      seller: { select: { id: true, name: true, email: true } },
+      seller: { select: { id: true, name: true, username: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: 48,
@@ -23,7 +23,7 @@ export default async function MarketplacePage() {
     priceCents: l.priceCents,
     createdAt: l.createdAt.toISOString(),
     card: { name: l.card.name, rarity: l.card.rarity, imageUrl: l.card.imageUrl },
-    seller: { id: l.seller.id, name: l.seller.name, email: l.seller.email },
+    seller: { id: l.seller.id, name: l.seller.name, username: l.seller.username },
   }))
 
   return (

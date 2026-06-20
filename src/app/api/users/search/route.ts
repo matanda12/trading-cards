@@ -12,13 +12,13 @@ export async function GET(request: NextRequest) {
   const users = await prisma.user.findMany({
     where: {
       OR: [
-        { email: { contains: q, mode: 'insensitive' } },
+        { username: { contains: q, mode: 'insensitive' } },
         { name: { contains: q, mode: 'insensitive' } },
       ],
       id: { not: user.id },
       isBanned: false,
     },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, username: true },
     take: 10,
   })
 

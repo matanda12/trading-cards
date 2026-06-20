@@ -43,8 +43,8 @@ export default async function TradeDetailPage({
   let trade = await prisma.trade.findUnique({
     where: { id: tradeId },
     include: {
-      initiator: { select: { id: true, name: true, email: true } },
-      receiver: { select: { id: true, name: true, email: true } },
+      initiator: { select: { id: true, name: true, username: true } },
+      receiver: { select: { id: true, name: true, username: true } },
       items: { include: { collectionEntry: { include: { card: true } } } },
     },
   })
@@ -91,13 +91,13 @@ export default async function TradeDetailPage({
         <p>
           From:{' '}
           <Link href={`/users/${trade.initiator.id}`} className="font-semibold hover:underline">
-            {trade.initiator.name ?? trade.initiator.email}
+            {trade.initiator.username ? `@${trade.initiator.username}` : (trade.initiator.name ?? 'Unknown')}
           </Link>
         </p>
         <p>
           To:{' '}
           <Link href={`/users/${trade.receiver.id}`} className="font-semibold hover:underline">
-            {trade.receiver.name ?? trade.receiver.email}
+            {trade.receiver.username ? `@${trade.receiver.username}` : (trade.receiver.name ?? 'Unknown')}
           </Link>
         </p>
         {trade.message && (
@@ -108,7 +108,7 @@ export default async function TradeDetailPage({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <h2 className="font-semibold text-xs text-muted-foreground uppercase tracking-widest">
-            {trade.initiator.name ?? trade.initiator.email} offers
+            {trade.initiator.username ? `@${trade.initiator.username}` : (trade.initiator.name ?? 'Unknown')} offers
           </h2>
           <div className="space-y-2">
             {offered.map((item) => (
@@ -122,7 +122,7 @@ export default async function TradeDetailPage({
 
         <div className="space-y-2">
           <h2 className="font-semibold text-xs text-muted-foreground uppercase tracking-widest">
-            {trade.receiver.name ?? trade.receiver.email} gives
+            {trade.receiver.username ? `@${trade.receiver.username}` : (trade.receiver.name ?? 'Unknown')} gives
           </h2>
           <div className="space-y-2">
             {wanted.map((item) => (

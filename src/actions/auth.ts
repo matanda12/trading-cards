@@ -8,7 +8,12 @@ import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
 
 const registerSchema = z.object({
-  name: z.string().min(2).trim(),
+  username: z
+    .string()
+    .min(3)
+    .max(20)
+    .trim()
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores'),
   email: z.string().email().trim(),
   password: z
     .string()
@@ -21,7 +26,7 @@ export type ActionState = { errors?: Record<string, string[]>; message?: string 
 
 export async function registerAction(state: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = registerSchema.safeParse({
-    name: formData.get('name'),
+    username: formData.get('username'),
     email: formData.get('email'),
     password: formData.get('password'),
   })
@@ -30,13 +35,17 @@ export async function registerAction(state: ActionState, formData: FormData): Pr
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  const { name, email, password } = parsed.data
+  const { username, email, password } = parsed.data
 
-  const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) return { errors: { email: ['Email already registered'] } }
+  const [existingEmail, existingUsername] = await Promise.all([
+    prisma.user.findUnique({ where: { email } }),
+    prisma.user.findUnique({ where: { username } }),
+  ])
+  if (existingEmail) return { errors: { email: ['Email already registered'] } }
+  if (existingUsername) return { errors: { username: ['Username already taken'] } }
 
   const passwordHash = await bcrypt.hash(password, 12)
-  await prisma.user.create({ data: { name, email, passwordHash } })
+  await prisma.user.create({ data: { username, email, passwordHash } })
 
   redirect('/login?registered=true')
 }
