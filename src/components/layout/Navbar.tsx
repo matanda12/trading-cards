@@ -112,8 +112,8 @@ export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean
           <DailyQuests />
           <NotificationBell />
           {loginStreak > 0 && (
-            <span className="hidden sm:flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/10 px-2.5 py-1.5 text-xs font-bold text-orange-400">
-              🔥 {loginStreak}
+            <span className="flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/10 px-2.5 py-1.5 text-xs font-bold text-orange-400" title="Login streak">
+              🔥 <span className="hidden sm:inline">Day </span>{loginStreak}
             </span>
           )}
           <Link
