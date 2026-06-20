@@ -33,7 +33,7 @@ export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean
 
   return (
     <nav className="sticky top-0 z-50 bg-[#080810]/90 backdrop-blur-md animate-navbar-glow border-b border-purple-500/20">
-      <div className="flex items-center gap-4 px-6 py-3">
+      <div className="flex items-center gap-2 md:gap-4 px-4 md:px-6 py-3">
         <Link
           href="/collection"
           className="font-cinzel font-black text-base shrink-0 bg-gradient-to-r from-amber-400 via-yellow-300 to-purple-400 bg-clip-text text-transparent tracking-widest uppercase"
@@ -108,17 +108,17 @@ export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean
 
         <div className="flex-1 md:hidden" />
 
-        <div className="flex items-center gap-2">
-          <DailyQuests />
+        <div className="flex items-center gap-1.5 md:gap-2">
+          <span className="hidden md:block"><DailyQuests /></span>
           <NotificationBell />
           {loginStreak > 0 && (
-            <span className="flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/10 px-2.5 py-1.5 text-xs font-bold text-orange-400" title="Login streak">
-              🔥 <span className="hidden sm:inline">Day </span>{loginStreak}
+            <span className="hidden md:flex items-center gap-1 rounded-full border border-orange-500/40 bg-orange-500/10 px-2.5 py-1.5 text-xs font-bold text-orange-400" title="Login streak">
+              🔥 Day {loginStreak}
             </span>
           )}
           <Link
             href="/coins"
-            className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
+            className="flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 md:px-3 py-1.5 text-xs md:text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
           >
             🪙 {coinBalance.toLocaleString()}
           </Link>
@@ -155,6 +155,12 @@ export function Navbar({ isAdmin, coinBalance, loginStreak }: { isAdmin: boolean
 
       {menuOpen && (
         <div className="md:hidden border-t border-purple-500/20 bg-[#080810]/95 px-4 py-3 space-y-1">
+          {/* Streak + quests summary on mobile */}
+          {loginStreak > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 mb-1">
+              <span className="text-sm font-bold text-orange-400">🔥 Day {loginStreak} streak</span>
+            </div>
+          )}
           {navLinks.map((link) => (
             <Link
               key={link.href}
