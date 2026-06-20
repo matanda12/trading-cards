@@ -9,7 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-cinzel);
+  --font-cinzel: var(--font-cinzel);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -84,11 +85,11 @@
 }
 
 .dark {
-  --background: oklch(0.09 0.025 285);
+  --background: oklch(0.055 0.018 285);
   --foreground: oklch(0.96 0.015 285);
-  --card: oklch(0.135 0.025 285);
+  --card: oklch(0.1 0.022 285);
   --card-foreground: oklch(0.96 0.015 285);
-  --popover: oklch(0.135 0.025 285);
+  --popover: oklch(0.1 0.022 285);
   --popover-foreground: oklch(0.96 0.015 285);
   --primary: oklch(0.55 0.25 285);
   --primary-foreground: oklch(0.985 0 0);
@@ -131,6 +132,13 @@
     @apply font-sans;
   }
 }
+
+@keyframes navbar-glow {
+  0%, 100% { box-shadow: 0 1px 20px rgba(168, 85, 247, 0.15), 0 1px 0 rgba(168, 85, 247, 0.2); }
+  50%       { box-shadow: 0 1px 30px rgba(168, 85, 247, 0.25), 0 1px 0 rgba(168, 85, 247, 0.35); }
+}
+.font-cinzel { font-family: var(--font-cinzel), serif; }
+.animate-navbar-glow { animation: navbar-glow 3s ease-in-out infinite; }
 
 @keyframes legendary-pulse {
   0%, 100% { box-shadow: 0 0 20px 4px rgba(251, 191, 36, 0.6); }

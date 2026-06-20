@@ -51,8 +51,8 @@ export default async function CollectionPage() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">My Collection</p>
-          <h1 className="text-3xl font-black tracking-tight">All Cards</h1>
+          <p className="font-cinzel text-xs font-semibold uppercase tracking-widest text-amber-400/70 mb-1">✦ My Collection</p>
+          <h1 className="font-cinzel text-3xl font-black tracking-wide text-white">My Collection</h1>
         </div>
       </div>
       <CollectionClient entries={serialized} />

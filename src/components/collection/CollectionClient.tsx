@@ -61,11 +61,11 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-2 items-center">
-        <div className="flex gap-1.5 flex-wrap flex-1">
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex gap-2 flex-wrap flex-1">
           <button
             onClick={() => setRarityFilter('')}
-            className={`text-xs px-3 py-1 rounded-full border font-semibold transition-colors ${!rarityFilter ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}
+            className={`text-xs px-4 py-1.5 rounded-full font-semibold tracking-wide transition-all ${!rarityFilter ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.5)]' : 'border border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20'}`}
           >
             All
           </button>
@@ -73,7 +73,7 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
             <button
               key={r}
               onClick={() => setRarityFilter(rarityFilter === r ? '' : r)}
-              className={`text-xs px-3 py-1 rounded-full border font-semibold transition-colors ${rarityFilter === r ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}
+              className={`text-xs px-4 py-1.5 rounded-full font-semibold tracking-wide transition-all ${rarityFilter === r ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.5)]' : 'border border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20'}`}
             >
               {RARITY_LABELS[r]}
             </button>
@@ -82,13 +82,13 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortOption)}
-          className="text-xs rounded-md border border-border bg-background px-2 py-1.5 text-muted-foreground"
+          className="text-xs rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-slate-400 hover:border-white/20 transition-colors"
         >
           <option value="rarity">Sort: Rarity</option>
           <option value="newest">Sort: Newest</option>
           <option value="name">Sort: A–Z</option>
         </select>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-slate-500">
           {dedupedFiltered.length} unique · {totalInFilter} total
         </span>
       </div>
@@ -110,7 +110,7 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
                   onClick={() => setSelectedIdx(i)}
                 />
                 {count > 1 && (
-                  <div className="absolute top-1.5 right-1.5 z-10 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-bold px-1.5 py-0.5 shadow-lg min-w-[1.5rem] text-center pointer-events-none">
+                  <div className="absolute top-1.5 right-1.5 z-10 rounded-full bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-1.5 py-0.5 shadow-lg min-w-[1.5rem] text-center pointer-events-none">
                     ×{count}
                   </div>
                 )}
