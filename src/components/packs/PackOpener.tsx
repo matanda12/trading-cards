@@ -142,11 +142,17 @@ export function PackOpener({ packId, coinCost, canAfford }: {
       {/* IDLE state */}
       {phase === 'IDLE' && (
         <div className="flex flex-col items-center gap-6 py-8 w-full">
-          <div className="w-48 h-64 rounded-2xl bg-gradient-to-br from-purple-900 to-indigo-900 border-2 border-purple-400/70 shadow-xl shadow-purple-500/20 flex flex-col items-center justify-center gap-2 animate-float cursor-pointer select-none"
+          <div
+            className="relative w-48 h-64 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-[0_0_30px_rgba(168,85,247,0.35)] animate-float cursor-pointer select-none"
             onClick={canAfford ? openPack : undefined}
           >
-            <p className="text-5xl">🃏</p>
-            <p className="text-purple-300 text-xs font-bold tracking-[0.2em] uppercase">Card Pack</p>
+            <Image
+              src="https://res.cloudinary.com/deqobi7dv/image/upload/v1781928998/trading-cards/card-back.png"
+              alt="Card pack"
+              fill
+              className="object-cover"
+              sizes="192px"
+            />
           </div>
           <Button onClick={openPack} disabled={!canAfford} size="lg" className="w-52">
             {canAfford ? `Open (${coinCost.toLocaleString()} coins)` : 'Not enough coins'}
@@ -162,10 +168,17 @@ export function PackOpener({ packId, coinCost, canAfford }: {
       {/* OPENING state — pack burst animation */}
       {phase === 'OPENING' && (
         <div className="flex flex-col items-center gap-6 py-8 w-full">
-          <div className="w-48 h-64 rounded-2xl bg-gradient-to-br from-purple-900 to-indigo-900 border-2 border-purple-400/70 shadow-xl shadow-purple-500/20 flex flex-col items-center justify-center gap-2 scale-150 opacity-0"
+          <div
+            className="relative w-48 h-64 rounded-2xl overflow-hidden border-2 border-amber-500/40 scale-150 opacity-0"
             style={{ transition: 'transform 0.3s, opacity 0.3s' }}
           >
-            <p className="text-5xl">🃏</p>
+            <Image
+              src="https://res.cloudinary.com/deqobi7dv/image/upload/v1781928998/trading-cards/card-back.png"
+              alt="Card pack"
+              fill
+              className="object-cover"
+              sizes="192px"
+            />
           </div>
           <p className="text-muted-foreground text-sm animate-pulse">Opening…</p>
         </div>
