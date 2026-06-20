@@ -100,7 +100,7 @@ export function CollectionClient({ entries }: { entries: CardEntry[] }) {
           description="Try a different rarity or clear the filter."
         />
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dedupedFiltered.map((entry, i) => {
             const count = copiesByCardId[entry.cardId] ?? 1
             return (
