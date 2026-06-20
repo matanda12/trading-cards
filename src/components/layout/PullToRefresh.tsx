@@ -24,7 +24,6 @@ export function PullToRefresh() {
       if (!pulling.current || refreshing) return
       const delta = e.touches[0].clientY - startY.current
       if (delta <= 0) { setPullY(0); return }
-      // Prevent the browser's native overscroll while we handle it
       if (window.scrollY === 0 && delta > 0) e.preventDefault()
       setPullY(Math.min(delta / RESISTANCE, THRESHOLD * 1.3))
     }
@@ -59,32 +58,40 @@ export function PullToRefresh() {
 
   const progress = Math.min(pullY / THRESHOLD, 1)
   const ready = pullY >= THRESHOLD
+  // Arrow rotates 0° → 180° as you pull (down arrow → up arrow = "let go")
+  const arrowRotation = progress * 180
 
   return (
     <div
       className="fixed top-14 left-0 right-0 z-40 flex justify-center pointer-events-none"
-      style={{ transform: `translateY(${pullY - 44}px)`, transition: pulling.current ? 'none' : 'transform 0.3s ease' }}
+      style={{ transform: `translateY(${pullY - 48}px)`, transition: pulling.current ? 'none' : 'transform 0.3s ease' }}
     >
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg border transition-colors duration-200 ${
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md border transition-all duration-200 ${
         ready || refreshing
-          ? 'bg-amber-500 border-amber-400'
-          : 'bg-[#0d0a18] border-purple-500/40'
-      }`}>
+          ? 'bg-amber-500/20 border-amber-400/60'
+          : 'bg-black/50 border-white/15'
+      }`}
+        style={{ backdropFilter: 'blur(8px)' }}
+      >
         {refreshing ? (
-          <svg className="w-5 h-5 text-black animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 100 10z" />
+          /* Spinning circular refresh arrow */
+          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke={ready ? '#fbbf24' : '#94a3b8'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12a9 9 0 11-6.219-8.56" />
           </svg>
         ) : (
+          /* Down arrow that rotates as you pull */
           <svg
-            className={`w-5 h-5 transition-colors duration-200 ${ready ? 'text-black' : 'text-purple-400'}`}
-            fill="none"
+            className="w-4 h-4"
             viewBox="0 0 24 24"
-            stroke="currentColor"
+            fill="none"
+            stroke={ready ? '#fbbf24' : '#94a3b8'}
             strokeWidth="2.5"
-            style={{ transform: `rotate(${progress * 180}deg)`, transition: pulling.current ? 'none' : 'transform 0.2s' }}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ transform: `rotate(${arrowRotation}deg)`, transition: pulling.current ? 'none' : 'transform 0.2s' }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <polyline points="19 12 12 19 5 12" />
           </svg>
         )}
       </div>
