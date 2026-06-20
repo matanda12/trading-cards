@@ -10,6 +10,11 @@ const cinzelDecorative = Cinzel_Decorative({ subsets: ['latin'], variable: '--fo
 export const metadata: Metadata = {
   title: 'Realms of Eternity',
   description: 'Collect, trade, and sell unique fantasy trading cards.',
+  appleWebApp: {
+    capable: true,
+    title: 'Realms of Eternity',
+    statusBarStyle: 'black-translucent',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
