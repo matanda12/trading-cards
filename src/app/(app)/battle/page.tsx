@@ -7,7 +7,7 @@ export default async function BattlePage() {
 
   const [entries, deck, recentBattles] = await Promise.all([
     prisma.collectionEntry.findMany({
-      where: { userId: user.id, listing: null, tradeItem: null },
+      where: { userId: user.id, listing: null, tradeItem: null, card: { isActive: true } },
       include: { card: { select: { id: true, name: true, imageUrl: true, rarity: true, category: true } } },
       orderBy: [{ card: { rarity: 'desc' } }, { card: { name: 'asc' } }],
     }),
@@ -50,7 +50,7 @@ export default async function BattlePage() {
         <h1 className="font-cinzel text-3xl font-black tracking-wide text-white">Card Battle</h1>
         <p className="text-slate-400 text-sm mt-1">
           Build a <span className="text-white font-semibold">5-card deck</span>, challenge opponents, and earn{' '}
-          <span className="text-amber-400 font-semibold">50 coins</span> per win.
+          <span className="text-amber-400 font-semibold">50–100 coins</span> per win.
         </p>
       </div>
       <BattleClient

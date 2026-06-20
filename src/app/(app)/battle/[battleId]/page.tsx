@@ -34,7 +34,7 @@ export default async function BattleReplayPage({
   const rounds = battle.rounds as RoundResult[]
   const allCardIds = [...new Set(rounds.flatMap((r) => [r.challengerCardId, r.opponentCardId]))]
   const cards = await prisma.card.findMany({
-    where: { id: { in: allCardIds } },
+    where: { id: { in: allCardIds }, isActive: true },
     select: { id: true, name: true, imageUrl: true, rarity: true, category: true },
   })
   const cardById = Object.fromEntries(cards.map((c) => [c.id, c]))

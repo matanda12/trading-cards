@@ -16,7 +16,7 @@ export default async function AdminWishlistPage() {
       by: ['cardId'],
       _count: { cardId: true },
     }),
-    prisma.card.findMany({ select: { id: true, name: true, rarity: true } }),
+    prisma.card.findMany({ where: { isActive: true }, select: { id: true, name: true, rarity: true } }),
   ])
 
   const ownerMap = Object.fromEntries(ownerCounts.map((o) => [o.cardId, o._count.cardId]))

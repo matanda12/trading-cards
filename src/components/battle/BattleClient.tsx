@@ -68,6 +68,11 @@ export function BattleClient({ userId, entries, savedDeckCards, recentBattles }:
   const deckFull = slots.every((s) => s !== null)
   const deckCardIds = new Set(slots.filter(Boolean).map((c) => c!.id))
 
+  // Faction synergy: 3+ same faction → +10 per card
+  const factionCounts: Record<string, number> = {}
+  for (const c of slots) if (c) factionCounts[c.category] = (factionCounts[c.category] ?? 0) + 1
+  const activeSynergies = Object.entries(factionCounts).filter(([, n]) => n >= 3).map(([f]) => f)
+
   // Cards already in collection (for display)
   const availableEntries = entries.filter((e) => !deckCardIds.has(e.card.id))
 
@@ -241,6 +246,17 @@ export function BattleClient({ userId, entries, savedDeckCards, recentBattles }:
             </p>
           )}
 
+          {/* Synergy active badges */}
+          {activeSynergies.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {activeSynergies.map((f) => (
+                <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 font-semibold">
+                  ✦ {f} Synergy active (+10 per card)
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Collection grid */}
           <div>
             <p className="text-sm font-semibold mb-3 text-muted-foreground">
@@ -281,10 +297,14 @@ export function BattleClient({ userId, entries, savedDeckCards, recentBattles }:
             </div>
           </div>
 
-          {/* Faction guide */}
-          <div className="rounded-xl border border-border/30 bg-card/20 p-3 text-xs text-muted-foreground">
-            <p className="font-semibold mb-1 text-foreground">Faction Advantage (+15 pts)</p>
-            <p>Arcane→Shadow→Light→Iron→Fire→Nature→Water→Arcane</p>
+          {/* Battle tips */}
+          <div className="rounded-xl border border-border/30 bg-card/20 p-3 space-y-1 text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground">Battle Tips</p>
+            <p>⚡ <span className="text-yellow-400">Round 3 — Power Round:</span> No luck. Pure skill wins.</p>
+            <p>🔥 <span className="text-red-400">Round 5 — Final Clash:</span> Luck doubled.</p>
+            <p>✦ <span className="text-purple-400">Synergy:</span> 3+ same-faction cards → +10 each.</p>
+            <p>🏆 <span className="text-amber-400">Clean Sweep (5–0):</span> +100 coins.</p>
+            <p className="pt-0.5">Faction Advantage (+15): Arcane→Shadow→Light→Iron→Fire→Nature→Water→Arcane</p>
           </div>
         </div>
       )}

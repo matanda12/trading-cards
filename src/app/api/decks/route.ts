@@ -30,16 +30,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'All 5 deck cards must be different' }, { status: 400 })
   }
 
-  // Verify user owns at least one unlocked copy of each card
+  // Verify user owns at least one unlocked copy of each card (must also be active)
   const missing: string[] = []
   for (const cardId of cardIds) {
+    const card = await prisma.card.findUnique({ where: { id: cardId }, select: { name: true, isActive: true } })
+    if (!card || !card.isActive) { missing.push(card?.name ?? cardId + ' (inactive)'); continue }
     const entry = await prisma.collectionEntry.findFirst({
       where: { userId: user.id, cardId, listing: null, tradeItem: null },
     })
-    if (!entry) {
-      const card = await prisma.card.findUnique({ where: { id: cardId }, select: { name: true } })
-      missing.push(card?.name ?? cardId)
-    }
+    if (!entry) missing.push(card.name)
   }
   if (missing.length > 0) {
     return NextResponse.json(
