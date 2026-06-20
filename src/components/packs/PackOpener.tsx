@@ -200,21 +200,16 @@ export function PackOpener({ packId, coinCost, canAfford }: {
                   >
                     {/* Card back (face-down) */}
                     <div
-                      className="rounded-xl overflow-hidden border-2 border-purple-500/50"
+                      className="rounded-xl overflow-hidden border-2 border-amber-500/40 shadow-[0_0_16px_rgba(168,85,247,0.3)] aspect-[5/7] relative"
                       style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' } as React.CSSProperties}
                     >
-                      <div className="aspect-[5/7] bg-gradient-to-br from-purple-950 via-indigo-900 to-purple-950 flex items-center justify-center relative">
-                        <div
-                          className="absolute inset-0 opacity-25"
-                          style={{
-                            backgroundImage: 'repeating-linear-gradient(45deg, rgba(168,85,247,0.3) 0px, rgba(168,85,247,0.3) 1px, transparent 1px, transparent 10px)',
-                          }}
-                        />
-                        <p className="text-purple-300/80 font-black text-xl tracking-[0.3em] z-10 select-none">CV</p>
-                      </div>
-                      <div className="bg-black/60 p-2 text-center text-xs text-purple-300/60 font-semibold">
-                        Realms of Eternity
-                      </div>
+                      <Image
+                        src="https://res.cloudinary.com/deqobi7dv/image/upload/v1781928998/trading-cards/card-back.png"
+                        alt="Card back"
+                        fill
+                        className="object-cover"
+                        sizes="144px"
+                      />
                     </div>
 
                     {/* Card front (revealed) */}
