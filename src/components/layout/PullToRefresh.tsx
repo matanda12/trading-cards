@@ -62,7 +62,7 @@ export function PullToRefresh() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
+      className="fixed top-14 left-0 right-0 z-40 flex justify-center pointer-events-none"
       style={{ transform: `translateY(${pullY - 44}px)`, transition: pulling.current ? 'none' : 'transform 0.3s ease' }}
     >
       <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg border transition-colors duration-200 ${
