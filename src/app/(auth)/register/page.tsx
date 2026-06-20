@@ -18,7 +18,7 @@ export default function RegisterPage() {
             href="/"
             className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight"
           >
-            CardVault
+            Realms of Eternity
           </Link>
           <h1 className="text-xl font-bold mt-3">Create your account</h1>
           <p className="text-muted-foreground text-sm mt-1">

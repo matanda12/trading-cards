@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${coins.toLocaleString()} CardVault Coins`,
+            name: `${coins.toLocaleString()} Realms of Eternity Coins`,
             description: `Add ${coins.toLocaleString()} coins to your account`,
           },
           unit_amount: priceCents,

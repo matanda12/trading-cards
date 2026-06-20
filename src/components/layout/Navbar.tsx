@@ -28,7 +28,7 @@ export function Navbar({ isAdmin, coinBalance }: { isAdmin: boolean; coinBalance
           href="/collection"
           className="font-black text-lg shrink-0 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight"
         >
-          CardVault
+          Realms of Eternity
         </Link>
 
         {/* Desktop nav links */}

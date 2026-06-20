@@ -213,7 +213,7 @@ export function PackOpener({ packId, coinCost, canAfford }: {
                         <p className="text-purple-300/80 font-black text-xl tracking-[0.3em] z-10 select-none">CV</p>
                       </div>
                       <div className="bg-black/60 p-2 text-center text-xs text-purple-300/60 font-semibold">
-                        CardVault
+                        Realms of Eternity
                       </div>
                     </div>
 

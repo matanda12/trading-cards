@@ -6,8 +6,8 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'Trading Card Platform',
-  description: 'Collect, trade, and sell unique trading cards.',
+  title: 'Realms of Eternity',
+  description: 'Collect, trade, and sell unique fantasy trading cards.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
