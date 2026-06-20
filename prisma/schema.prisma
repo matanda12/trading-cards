@@ -59,6 +59,9 @@ model User {
   wishlist          Wishlist[]
   giftsSent         Gift[]            @relation("GiftsSent")
   giftsReceived     Gift[]            @relation("GiftsReceived")
+  deck              Deck?
+  battlesAsChallenger Battle[]        @relation("BattlesAsChallenger")
+  battlesAsOpponent   Battle[]        @relation("BattlesAsOpponent")
 }
 
 model Session {
@@ -85,6 +88,7 @@ model Card {
   packSlots         PackSlot[]
   listings          Listing[]
   wishlistedBy      Wishlist[]
+  deckCards         DeckCard[]
 }
 
 model CollectionEntry {
@@ -248,6 +252,47 @@ model Wishlist {
   @@unique([userId, cardId])
   @@index([userId])
   @@index([cardId])
+}
+
+model Deck {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  name      String     @default("My Deck")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards DeckCard[]
+}
+
+model DeckCard {
+  id     String @id @default(cuid())
+  deckId String
+  cardId String
+  slot   Int
+
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@unique([deckId, slot])
+  @@index([deckId])
+}
+
+model Battle {
+  id           String   @id @default(cuid())
+  challengerId String
+  opponentId   String?
+  isAiOpponent Boolean  @default(false)
+  winnerId     String?
+  rounds       Json
+  coinAwarded  Boolean  @default(false)
+  foughtAt     DateTime @default(now())
+
+  challenger User  @relation("BattlesAsChallenger", fields: [challengerId], references: [id])
+  opponent   User? @relation("BattlesAsOpponent", fields: [opponentId], references: [id])
+
+  @@index([challengerId])
+  @@index([opponentId])
 }
 
 model Gift {

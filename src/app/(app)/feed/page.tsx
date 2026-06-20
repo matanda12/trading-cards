@@ -18,7 +18,7 @@ function displayName(user: { username: string | null; name: string | null }) {
 export default async function FeedPage() {
   await requireAuth()
 
-  const [packOpens, completedTrades, recentRedeems] = await Promise.all([
+  const [packOpens, completedTrades, recentRedeems, recentBattles] = await Promise.all([
     prisma.packOpen.findMany({
       where: { openedAt: { not: null } },
       include: {
@@ -46,6 +46,16 @@ export default async function FeedPage() {
         card: { select: { name: true, rarity: true } },
       },
       orderBy: { obtainedAt: 'desc' },
+      take: 20,
+    }),
+
+    prisma.battle.findMany({
+      where: { isAiOpponent: false },
+      include: {
+        challenger: { select: { id: true, username: true, name: true } },
+        opponent: { select: { id: true, username: true, name: true } },
+      },
+      orderBy: { foughtAt: 'desc' },
       take: 20,
     }),
   ])
@@ -78,6 +88,22 @@ export default async function FeedPage() {
       message: isLegendary
         ? `${displayName(entry.user)} redeemed a LEGENDARY "${entry.card.name}"!`
         : `${displayName(entry.user)} redeemed "${entry.card.name}".`,
+    })
+  }
+
+  for (const battle of recentBattles) {
+    if (!battle.opponent) continue
+    const winner = battle.winnerId
+      ? battle.winnerId === battle.challengerId
+        ? displayName(battle.challenger)
+        : displayName(battle.opponent)
+      : null
+    events.push({
+      time: battle.foughtAt,
+      emoji: '⚔️',
+      message: winner
+        ? `${winner} defeated ${battle.winnerId === battle.challengerId ? displayName(battle.opponent) : displayName(battle.challenger)} in a card battle!`
+        : `${displayName(battle.challenger)} and ${displayName(battle.opponent)} tied in a card battle.`,
     })
   }
 

@@ -13,6 +13,7 @@ import { Settings, Menu, X, ChevronDown } from 'lucide-react'
 const navLinks = [
   { href: '/collection', label: 'Collection' },
   { href: '/packs', label: 'Packs' },
+  { href: '/battle', label: '⚔️ Battle' },
   { href: '/trades', label: 'Trades' },
   { href: '/marketplace', label: 'Market' },
   { href: '/leaderboard', label: 'Ranks' },
